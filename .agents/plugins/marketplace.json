@@ -1,0 +1,20 @@
+{
+  "name": "my-codex-skills",
+  "interface": {
+    "displayName": "My Codex Skills"
+  },
+  "plugins": [
+    {
+      "name": "ticket-to-pr-workflow",
+      "source": {
+        "source": "local",
+        "path": "./plugins/ticket-to-pr-workflow"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Storybook Verifier"
+  short_description: "Plan and verify Storybook stories for changed UI components"
+  default_prompt: "Use $storybook-verifier to inspect the selected agent run, plan approved Storybook story work, run available checks, and update delivery reports without committing or creating a PR."

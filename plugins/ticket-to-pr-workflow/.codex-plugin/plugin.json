@@ -1,0 +1,23 @@
+{
+  "name": "ticket-to-pr-workflow",
+  "version": "0.1.0+codex.20260609185633",
+  "description": "Codex App-native ticket-to-PR workflow suite for local and private marketplaces.",
+  "author": {
+    "name": "my-codex-skills contributors"
+  },
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Ticket to PR Workflow",
+    "shortDescription": "Critique plans, implement safely, verify, and prepare ticket-scoped PRs.",
+    "longDescription": "A Codex App-native parent workflow that orchestrates Jira intake, implementation planning and critique, approval-gated code work, risk-aware verification, Storybook and browser gates, and PR reporting.",
+    "developerName": "my-codex-skills contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Interactive",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use ticket-to-pr-workflow for this repository."
+    ]
+  }
+}

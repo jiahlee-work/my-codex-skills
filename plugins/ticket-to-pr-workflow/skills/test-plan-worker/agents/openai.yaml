@@ -1,0 +1,4 @@
+interface:
+  display_name: "Test Plan Worker"
+  short_description: "Detect test setup and prepare test plans"
+  default_prompt: "Use $test-plan-worker to inspect the selected ticket run and prepare its test plan."
