@@ -1,0 +1,35 @@
+{
+  "name": "nextjs-app-router",
+  "version": "0.1.0+codex.20260611100006",
+  "description": "Codex skills for designing, building, and auditing Next.js App Router projects.",
+  "author": {
+    "name": "my-codex-skills contributors"
+  },
+  "repository": "https://github.com/ndnv819/my-codex-skills",
+  "license": "MIT",
+  "keywords": [
+    "nextjs",
+    "app-router",
+    "architecture",
+    "layered-architecture",
+    "typescript",
+    "scaffold"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Next.js App Router",
+    "shortDescription": "Build and audit Next.js App Router projects.",
+    "longDescription": "A collection of Codex skills for Next.js App Router development. The current layered architecture skill separates product code into presentation, application, and infrastructure while keeping src/app as a thin framework boundary and src/shared as a neutral supporting area.",
+    "developerName": "my-codex-skills contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Analyze",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Structure this Next.js App Router project.",
+      "Audit this project's Next.js layer boundaries.",
+      "Move this App Router feature into the correct layers."
+    ]
+  }
+}

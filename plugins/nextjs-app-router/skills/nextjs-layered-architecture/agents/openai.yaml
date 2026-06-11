@@ -1,0 +1,4 @@
+interface:
+  display_name: "Next.js Layered Architecture"
+  short_description: "Scaffold and audit layered App Router projects"
+  default_prompt: "Use $nextjs-app-router:nextjs-layered-architecture to structure this Next.js App Router project."

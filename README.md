@@ -6,6 +6,16 @@
 
 ## Plugins 목록
 
+### nextjs-app-router
+
+Next.js App Router 프로젝트의 설계, 구현, 검증을 지원하는 skill 모음입니다.
+현재 포함된 `nextjs-layered-architecture` skill은 `src/app`을 얇게 유지하고,
+제품 코드를 `presentation`, `application`, `infrastructure`의 3개 핵심
+Layer로 분리합니다. `shared`는 중립적인 지원 영역으로 두고 TypeScript AST로
+역방향 의존을 검사합니다.
+
+- [상세 설명](plugins/nextjs-app-router/README.md)
+
 ### ticket-to-pr-workflow
 
 티켓 기반 개발의 맥락 수집부터 PR 준비까지를 parent skill과 9개 child
