@@ -72,13 +72,15 @@ function run(
 }
 
 describe("nextjs-layered-architecture", () => {
-  it("creates the standard layers and configures the src alias", () => {
+  it("creates the standard structure and configures root and layer aliases", () => {
     const project = createProject();
 
     const result = run("setup", project, "--json");
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe("");
+    expect(fs.existsSync(path.join(project, "public", "assets"))).toBe(true);
+    expect(fs.existsSync(path.join(project, "src", "types"))).toBe(true);
     expect(fs.existsSync(path.join(project, "src", "presentation", "features"))).toBe(
       true
     );
@@ -89,11 +91,29 @@ describe("nextjs-layered-architecture", () => {
       true
     );
     expect(fs.existsSync(path.join(project, "src", "shared", "types"))).toBe(true);
+    expect(fs.existsSync(path.join(project, "src", "application", "jotai"))).toBe(
+      false
+    );
+    expect(
+      fs.existsSync(path.join(project, "src", "infrastructure", "firebase"))
+    ).toBe(false);
+    expect(
+      fs.existsSync(path.join(project, "src", "infrastructure", "redis"))
+    ).toBe(false);
+    expect(
+      fs.existsSync(path.join(project, "src", "infrastructure", "audio"))
+    ).toBe(false);
 
     const tsconfig = JSON.parse(
       fs.readFileSync(path.join(project, "tsconfig.json"), "utf8")
     );
-    expect(tsconfig.compilerOptions.paths["@/*"]).toEqual(["./src/*"]);
+    expect(tsconfig.compilerOptions.paths).toMatchObject({
+      "@/*": ["./src/*"],
+      "@application/*": ["./src/application/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"],
+      "@presentation/*": ["./src/presentation/*"],
+      "@shared/*": ["./src/shared/*"],
+    });
 
     const audit = run("audit", project, "--json");
     expect(audit.status).toBe(0);
@@ -139,6 +159,29 @@ describe("nextjs-layered-architecture", () => {
     );
   });
 
+  it("reports a missing explicit layer alias", () => {
+    const project = createProject();
+    expect(run("setup", project).status).toBe(0);
+
+    const tsconfigPath = path.join(project, "tsconfig.json");
+    const tsconfig = JSON.parse(fs.readFileSync(tsconfigPath, "utf8"));
+    delete tsconfig.compilerOptions.paths["@shared/*"];
+    fs.writeFileSync(tsconfigPath, `${JSON.stringify(tsconfig, null, 2)}\n`);
+
+    const result = run("audit", project, "--json");
+    const output = JSON.parse(result.stdout);
+
+    expect(result.status).toBe(1);
+    expect(output.findings).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          code: "path-alias",
+          file: "tsconfig.json",
+        }),
+      ])
+    );
+  });
+
   it("detects imports from infrastructure to application", () => {
     const project = createProject();
     expect(run("setup", project).status).toBe(0);
@@ -150,7 +193,7 @@ describe("nextjs-layered-architecture", () => {
     fs.writeFileSync(
       path.join(project, "src", "infrastructure", "apis", "payment.ts"),
       [
-        'import { paymentService } from "@/application/services/payment";',
+        'import { paymentService } from "@application/services/payment";',
         "export const paymentApi = paymentService;",
         "",
       ].join("\n")
@@ -164,7 +207,7 @@ describe("nextjs-layered-architecture", () => {
       expect.objectContaining({
         importerLayer: "infrastructure",
         importedLayer: "application",
-        specifier: "@/application/services/payment",
+        specifier: "@application/services/payment",
       }),
     ]);
   });

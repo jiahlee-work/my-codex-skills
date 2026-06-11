@@ -12,8 +12,11 @@
 ## Source Shape
 
 ```text
+public/
+  assets/
 src/
   app/
+  types/
   presentation/
     components/
     features/
@@ -21,15 +24,11 @@ src/
     providers/
   application/
     hooks/
-    jotai/
     logging/
     services/
   infrastructure/
     apis/
     network/
-    firebase/
-    redis/
-    audio/
     utils/
   shared/
     types/
@@ -84,7 +83,7 @@ Do not place these in `app`:
 
 - complex UI implementations
 - screen-level business logic
-- React Query hooks or Jotai atoms
+- server-state hooks or application state stores
 - API request functions or HTTP clients
 - Firebase or external SDK initialization
 - shared utilities
@@ -117,7 +116,7 @@ Own user intent and application flow:
 
 - use cases and orchestration across infrastructure functions
 - React Query hooks and cache/retry policy
-- Jotai atoms and application state
+- application state and state-management adapters chosen by the project
 - reusable application hooks
 - success, failure, and application-level logging flow
 
@@ -131,13 +130,13 @@ Own concrete interaction with external systems:
 - REST, GraphQL, Axios, and fetch implementations
 - request and response DTOs
 - response mappers
-- Firebase, Redis, and external SDK clients
+- database, cache, and external SDK clients selected by the project
 - browser APIs, files, PDF, audio, and storage implementations
 - network error conversion and technical retry behavior
 
 Infrastructure must not know whether a result is shown in a table, card, modal,
-or another visual form. Do not place React Query hooks, Jotai atoms, JSX, or
-screen-specific user flows here.
+or another visual form. Do not place server-state hooks, application state,
+JSX, or screen-specific user flows here.
 
 ### shared
 
@@ -150,6 +149,19 @@ Own only neutral concepts that can be used from multiple layers:
 - route paths, storage keys, pagination types
 
 `shared` is not a `common`, `misc`, or generic `utils` dumping ground.
+
+### types
+
+Use `src/types` only for ambient declarations and type overrides that must be
+expressed as `.d.ts` files:
+
+- module augmentation
+- global declarations
+- third-party package type overrides
+- asset or environment module declarations
+
+Do not place normal imported product types here. Put neutral imported types in
+`src/shared/types`, and keep feature-specific types near their owning layer.
 
 ## Dependency Rules
 
@@ -178,13 +190,25 @@ The contract permits presentation to import infrastructure for a narrow,
 presentation-specific technical need, but do not bypass application ownership
 for normal product flows.
 
-Use `@/*` for cross-layer imports:
+Configure these aliases:
+
+```json
+{
+  "@/*": ["./src/*"],
+  "@application/*": ["./src/application/*"],
+  "@infrastructure/*": ["./src/infrastructure/*"],
+  "@presentation/*": ["./src/presentation/*"],
+  "@shared/*": ["./src/shared/*"]
+}
+```
+
+Use the explicit layer aliases for cross-layer imports:
 
 ```ts
-import Button from "@/presentation/components/button";
-import { useSubscriptionHistory } from "@/application/hooks/api/payment/use-subscription-history";
-import { paymentApi } from "@/infrastructure/apis/payment";
-import { ROUTE_PATHS } from "@/shared/constants/route-paths";
+import Button from "@presentation/components/button";
+import { useSubscriptionHistory } from "@application/hooks/api/payment/use-subscription-history";
+import { paymentApi } from "@infrastructure/apis/payment";
+import { ROUTE_PATHS } from "@shared/constants/route-paths";
 ```
 
 Relative imports are acceptable between small neighboring files:
@@ -198,7 +222,7 @@ import { SubscriptionHistoryTable } from "./subscription-history-table";
 A route entry should delegate:
 
 ```tsx
-import SubscriptionHistoryPage from "@/presentation/features/my/subscription/history";
+import SubscriptionHistoryPage from "@presentation/features/my/subscription/history";
 
 export default function Page() {
   return <SubscriptionHistoryPage />;
@@ -212,7 +236,7 @@ the directory topology is complex.
 Keep route handlers thin as well:
 
 ```ts
-import { getPaymentHistory } from "@/application/services/payment/get-payment-history";
+import { getPaymentHistory } from "@application/services/payment/get-payment-history";
 
 export async function GET() {
   const history = await getPaymentHistory();
@@ -230,7 +254,8 @@ export async function GET() {
 - Do not import server-only infrastructure into Client Components.
 - Split infrastructure modules into explicit server/client implementations
   when an integration spans both runtimes.
-- Treat React Query and Jotai entry points as client-side application code.
+- Treat client-side server-state and state-management entry points as
+  application code.
 
 Layer ownership and runtime ownership are separate checks. A file can be in the
 correct layer and still violate a Server/Client Component boundary.

@@ -1,6 +1,6 @@
 ---
 name: nextjs-layered-architecture
-description: "Scaffold, organize, extend, migrate, and audit Next.js App Router projects around three core product layers: presentation, application, and infrastructure, with src/app as a thin framework boundary and src/shared as a neutral supporting area. Use when Codex needs to create or repair an App Router structure, decide where new code belongs, add a route or feature, configure the @/* alias, move product code out of app, or check layer boundaries and naming rules."
+description: "Scaffold, organize, extend, migrate, and audit Next.js App Router projects around three core product layers: presentation, application, and infrastructure, with src/app as a thin framework boundary and src/shared as a neutral supporting area. Use when Codex needs to create or repair an App Router structure, decide where new code belongs, add a route or feature, configure TypeScript path aliases, move product code out of app, or check layer boundaries and naming rules."
 ---
 
 # Next.js Layered Architecture
@@ -19,10 +19,14 @@ Treat the remaining source areas as supporting boundaries:
 
 - `app`: Next.js routing and framework composition
 - `shared`: stable, neutral concepts reused across layers
+- `types`: ambient declarations and module augmentation in `.d.ts` files
 
 ```text
+public/
+  assets/
 src/
   app/
+  types/
   presentation/
   application/
   infrastructure/
@@ -96,7 +100,8 @@ The setup command:
 - verifies that `next` is declared
 - rejects an unreviewed root `app/` or Pages Router-only layout
 - creates the standard layer directories
-- maps `@/*` to `./src/*`
+- creates `public/assets` and `src/types`
+- configures root and explicit layer aliases
 - preserves existing source files and dependencies
 
 Do not automatically move a root `app/` directory. Route groups, parallel
@@ -114,12 +119,14 @@ Classify new code in this order:
 1. Next.js route, layout, route handler, metadata, or framework boundary:
    `src/app`
 2. Visible UI or interaction composition: `src/presentation`
-3. User flow, use case, React Query, Jotai, or application policy:
+3. User flow, use case, server-state handling, application state, or policy:
    `src/application`
 4. API, database, Firebase, SDK, browser, or network implementation:
    `src/infrastructure`
 5. Stable cross-layer type, constant, schema, guard, or pure utility:
    `src/shared`
+6. Ambient declaration, module augmentation, or third-party type override:
+   `src/types`
 
 Keep `page.tsx` and `route.ts` thin. They may compose lower areas but must not
 own reusable product behavior.
@@ -142,9 +149,9 @@ Migrate one responsibility chain at a time:
 - external integrations to `infrastructure`
 - only neutral, stable concepts to `shared`
 
-Update imports to `@/*` and verify after each coherent move. Read imports,
-exports, callers, and runtime directives instead of inferring ownership from
-the current folder name.
+Update imports to the configured aliases and verify after each coherent move.
+Read imports, exports, callers, and runtime directives instead of inferring
+ownership from the current folder name.
 
 ## Audit
 
@@ -164,10 +171,10 @@ Run only the import boundary check:
 
 Add `--json` for machine-readable output.
 
-The audit checks structure, `@/*`, thin `src/app` boundaries, JSX placement,
-kebab-case names, and forbidden imports. AST-based checks require an available
-`typescript` package. Do not add a dependency without approval; install the
-project's existing dependencies first.
+The audit checks structure, path aliases, thin `src/app` boundaries, JSX
+placement, kebab-case names, and forbidden imports. AST-based checks require
+an available `typescript` package. Do not add a dependency without approval;
+install the project's existing dependencies first.
 
 ## Report
 

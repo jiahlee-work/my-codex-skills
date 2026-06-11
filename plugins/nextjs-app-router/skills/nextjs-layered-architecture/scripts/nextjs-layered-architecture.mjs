@@ -27,20 +27,18 @@ const IGNORED_DIRECTORIES = new Set([
 ]);
 
 const REQUIRED_DIRECTORIES = [
+  "public/assets",
   "src/app",
+  "src/types",
   "src/presentation/components",
   "src/presentation/features",
   "src/presentation/layouts",
   "src/presentation/providers",
   "src/application/hooks",
-  "src/application/jotai",
   "src/application/logging",
   "src/application/services",
   "src/infrastructure/apis",
   "src/infrastructure/network",
-  "src/infrastructure/firebase",
-  "src/infrastructure/redis",
-  "src/infrastructure/audio",
   "src/infrastructure/utils",
   "src/shared/types",
   "src/shared/constants",
@@ -49,6 +47,14 @@ const REQUIRED_DIRECTORIES = [
   "src/shared/errors",
   "src/shared/guards",
 ];
+
+const PATH_ALIASES = {
+  "@/*": ["./src/*"],
+  "@application/*": ["./src/application/*"],
+  "@infrastructure/*": ["./src/infrastructure/*"],
+  "@presentation/*": ["./src/presentation/*"],
+  "@shared/*": ["./src/shared/*"],
+};
 
 const REQUIRED_LAYER_DIRECTORIES = [
   "src/app",
@@ -125,7 +131,7 @@ function usage() {
     "Usage: nextjs-layered-architecture <command> [options]",
     "",
     "Commands:",
-    "  setup             Create the layered src structure and configure @/*",
+    "  setup             Create the layered structure and configure path aliases",
     "  audit             Audit project structure, app thinness, and boundaries",
     "  boundary-check    Check imports between app and architecture layers",
     "",
@@ -423,23 +429,38 @@ function configureAlias(projectRoot, packageJson, options) {
   data.compilerOptions ??= {};
   data.compilerOptions.paths ??= {};
 
-  const currentAlias = data.compilerOptions.paths["@/*"];
-  const expectedAlias = ["./src/*"];
-  const hasExpectedAlias =
-    Array.isArray(currentAlias) &&
-    currentAlias.length === 1 &&
-    currentAlias[0] === expectedAlias[0];
+  const conflicts = Object.entries(PATH_ALIASES).filter(
+    ([alias, expected]) => {
+      const current = data.compilerOptions.paths[alias];
+      return (
+        current !== undefined &&
+        (!Array.isArray(current) ||
+          current.length !== expected.length ||
+          current.some((value, index) => value !== expected[index]))
+      );
+    },
+  );
 
-  if (hasExpectedAlias) {
+  const missingAliases = Object.entries(PATH_ALIASES).filter(
+    ([alias]) => data.compilerOptions.paths[alias] === undefined,
+  );
+
+  if (conflicts.length === 0 && missingAliases.length === 0) {
     return { updated: null, warning: null };
   }
 
-  if (currentAlias !== undefined && !options.force) {
+  if (conflicts.length > 0 && !options.force) {
+    const details = conflicts
+      .map(
+        ([alias]) =>
+          `${alias}=${JSON.stringify(data.compilerOptions.paths[alias])}`,
+      )
+      .join(", ");
     return {
       updated: null,
       warning:
-        `${path.basename(configPath)} already defines @/* as ` +
-        `${JSON.stringify(currentAlias)}; use --force to replace it`,
+        `${path.basename(configPath)} defines conflicting path aliases: ` +
+        `${details}; use --force to replace them`,
     };
   }
 
@@ -448,11 +469,13 @@ function configureAlias(projectRoot, packageJson, options) {
       updated: null,
       warning:
         `${path.basename(configPath)} contains comments or trailing commas; ` +
-        "configure @/* manually or use --force to rewrite it as JSON",
+        "configure path aliases manually or use --force to rewrite it as JSON",
     };
   }
 
-  data.compilerOptions.paths["@/*"] = expectedAlias;
+  for (const [alias, target] of Object.entries(PATH_ALIASES)) {
+    data.compilerOptions.paths[alias] = target;
+  }
   if (!options.dryRun) {
     fs.writeFileSync(configPath, `${JSON.stringify(data, null, 2)}\n`);
   }
@@ -616,14 +639,24 @@ function inspectAlias(projectRoot) {
 
   try {
     const parsed = readJsonConfig(configPath);
-    const alias = parsed?.data?.compilerOptions?.paths?.["@/*"];
-    const ok =
-      Array.isArray(alias) && alias.length === 1 && alias[0] === "./src/*";
+    const paths = parsed?.data?.compilerOptions?.paths ?? {};
+    const invalidAliases = Object.entries(PATH_ALIASES).filter(
+      ([alias, expected]) => {
+        const current = paths[alias];
+        return (
+          !Array.isArray(current) ||
+          current.length !== expected.length ||
+          current.some((value, index) => value !== expected[index])
+        );
+      },
+    );
+    const ok = invalidAliases.length === 0;
     return {
       ok,
       message: ok
         ? null
-        : `@/* must map to ["./src/*"], found ${JSON.stringify(alias)}`,
+        : `path aliases must match ${JSON.stringify(PATH_ALIASES)}; invalid aliases: ` +
+          invalidAliases.map(([alias]) => alias).join(", "),
       file: relativePath(projectRoot, configPath),
     };
   } catch (error) {
@@ -764,8 +797,13 @@ function resolveFile(candidate) {
 }
 
 function resolveImport(projectRoot, importerFile, specifier) {
-  if (specifier.startsWith("@/")) {
-    return resolveFile(path.join(projectRoot, "src", specifier.slice(2)));
+  for (const [aliasPattern, [targetPattern]] of Object.entries(PATH_ALIASES)) {
+    const aliasPrefix = aliasPattern.slice(0, -1);
+    if (!specifier.startsWith(aliasPrefix)) continue;
+
+    const targetPrefix = targetPattern.slice(0, -1);
+    const suffix = specifier.slice(aliasPrefix.length);
+    return resolveFile(path.resolve(projectRoot, targetPrefix, suffix));
   }
 
   if (specifier.startsWith(".")) {

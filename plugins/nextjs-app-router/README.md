@@ -15,8 +15,11 @@ App Router와 관련된 독립적인 기능을 하위 skill로 추가할 수 있
 영역으로 유지합니다.
 
 ```text
+public/
+  assets/
 src/
   app/              # Next.js boundary
+  types/            # ambient declarations and type overrides
   presentation/     # core layer
   application/      # core layer
   infrastructure/   # core layer
@@ -26,7 +29,8 @@ src/
 주요 기능:
 
 - Layer 구조와 권장 하위 폴더 생성
-- `@/*` alias 설정
+- `public/assets`, `src/types` 생성
+- root 및 Layer별 TypeScript alias 설정
 - 코드의 변경 이유에 따른 파일 위치 판단
 - `src/app` 내부의 비라우팅 코드 탐지
 - TypeScript AST 기반 역방향 import 검사
