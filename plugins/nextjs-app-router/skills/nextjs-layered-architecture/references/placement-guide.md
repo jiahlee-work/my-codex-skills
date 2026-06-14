@@ -81,7 +81,7 @@ src/app/my/subscription/history/page.tsx
 Route entry:
 
 ```tsx
-import SubscriptionHistoryPage from "@presentation/features/my/subscription/history";
+import SubscriptionHistoryPage from "@/presentation/features/my/subscription/history";
 
 export default function Page() {
   return <SubscriptionHistoryPage />;
@@ -93,7 +93,7 @@ Presentation:
 ```tsx
 "use client";
 
-import { useSubscriptionHistory } from "@application/hooks/api/payment/use-subscription-history";
+import { useSubscriptionHistory } from "@/application/hooks/api/payment/use-subscription-history";
 import { SubscriptionHistoryEmpty } from "./subscription-history-empty";
 import { SubscriptionHistorySkeleton } from "./subscription-history-skeleton";
 import { SubscriptionHistoryTable } from "./subscription-history-table";
@@ -113,7 +113,7 @@ Application:
 
 ```ts
 import { useQuery } from "@tanstack/react-query";
-import { paymentApi } from "@infrastructure/apis/payment";
+import { paymentApi } from "@/infrastructure/apis/payment";
 
 export function useSubscriptionHistory() {
   return useQuery({
@@ -126,7 +126,7 @@ export function useSubscriptionHistory() {
 Infrastructure:
 
 ```ts
-import { httpClient } from "@infrastructure/network/http-client";
+import { httpClient } from "@/infrastructure/network/http-client";
 
 export const paymentApi = {
   async getSubscriptionHistory() {
@@ -162,7 +162,8 @@ Before moving files:
 2. List files currently owned by `app`.
 3. Group them by UI, application flow, integration, or neutral shared concept.
 4. Move one coherent dependency chain at a time.
-5. Update imports to the configured root or layer aliases.
+5. Run `fix-imports` or manually update cross-folder imports to the `@/*`
+   alias.
 6. Run typecheck and boundary checks after each group.
 
 Do not infer ownership from the current directory name. Read imports, exports,
@@ -186,8 +187,10 @@ When moving from root `app/` to `src/app`:
 - Are concrete external calls and DTOs in `infrastructure`?
 - Does every `shared` file meet the neutral reuse criteria?
 - Do imports follow the allowed direction?
-- Do the root and explicit layer aliases resolve to their expected `src`
-  directories?
+- Does the root `@/*` alias resolve to `src`?
+- Are imports that climb two or more parent directories replaced with `@/...`?
+- Are legacy aliases such as `@application/...` replaced with
+  `@/application/...`?
 - Are source file names kebab-case?
 - Are Server/Client Component boundaries still valid?
 - Did the project's lint, typecheck, tests, and build pass?

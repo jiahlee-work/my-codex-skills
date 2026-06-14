@@ -1,6 +1,6 @@
 ---
 name: nextjs-layered-architecture
-description: "Scaffold, organize, extend, migrate, and audit Next.js App Router projects around three core product layers: presentation, application, and infrastructure, with src/app as a thin framework boundary and src/shared as a neutral supporting area. Use when Codex needs to create or repair an App Router structure, decide where new code belongs, add a route or feature, configure TypeScript path aliases, move product code out of app, or check layer boundaries and naming rules."
+description: "Scaffold, organize, extend, migrate, and audit Next.js App Router projects around three core product layers: presentation, application, and infrastructure, with src/app as a thin framework boundary and src/shared as a neutral supporting area. Use when Codex needs to create or repair an App Router structure, decide where new code belongs, add a route or feature, configure the root @/* TypeScript path alias, rewrite non-canonical imports to @/... imports, move product code out of app, or check layer boundaries and naming rules."
 ---
 
 # Next.js Layered Architecture
@@ -101,7 +101,7 @@ The setup command:
 - rejects an unreviewed root `app/` or Pages Router-only layout
 - creates the standard layer directories
 - creates `public/assets` and `src/types`
-- configures root and explicit layer aliases
+- configures the root `@/*` alias
 - preserves existing source files and dependencies
 
 Do not automatically move a root `app/` directory. Route groups, parallel
@@ -149,9 +149,35 @@ Migrate one responsibility chain at a time:
 - external integrations to `infrastructure`
 - only neutral, stable concepts to `shared`
 
-Update imports to the configured aliases and verify after each coherent move.
+Update cross-folder imports to the `@/*` alias and verify after each coherent
+move. Keep short sibling imports such as `./subscription-history-table`, but
+replace imports that climb two or more parent directories with `@/...`. Also
+rewrite legacy explicit layer aliases such as `@application/...` to
+`@/application/...`.
 Read imports, exports, callers, and runtime directives instead of inferring
 ownership from the current folder name.
+
+To rewrite non-canonical imports automatically:
+
+```bash
+./scripts/nextjs-layered-architecture.sh fix-imports \
+  --project <project-root> \
+  --dry-run
+
+./scripts/nextjs-layered-architecture.sh fix-imports \
+  --project <project-root>
+```
+
+This is the safe auto-fix boundary for the skill. It rewrites resolvable deep
+relative imports and legacy explicit layer aliases to `@/...`. Editor save
+hooks are project-specific; when requested, wire this command into the
+project's editor or lint-on-save workflow instead of assuming the skill can
+intercept saves.
+
+Before rewriting imports, `fix-imports` checks root ESLint configuration for
+known import path rewrite rules. If ESLint already owns import path rewriting,
+the command skips changes to avoid save-time conflicts. Use `--force` only
+when intentionally overriding that guard.
 
 ## Audit
 
@@ -171,10 +197,11 @@ Run only the import boundary check:
 
 Add `--json` for machine-readable output.
 
-The audit checks structure, path aliases, thin `src/app` boundaries, JSX
-placement, kebab-case names, and forbidden imports. AST-based checks require
-an available `typescript` package. Do not add a dependency without approval;
-install the project's existing dependencies first.
+The audit checks structure, the root `@/*` alias, thin `src/app` boundaries,
+JSX placement, kebab-case names, non-canonical imports, and forbidden imports.
+Run `fix-imports` before `audit` when the task should auto-correct import
+style. AST-based checks require an available `typescript` package. Do not add a
+dependency without approval; install the project's existing dependencies first.
 
 ## Report
 

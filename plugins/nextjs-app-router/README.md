@@ -30,9 +30,12 @@ src/
 
 - Layer 구조와 권장 하위 폴더 생성
 - `public/assets`, `src/types` 생성
-- root 및 Layer별 TypeScript alias 설정
+- root `@/*` TypeScript alias 설정
 - 코드의 변경 이유에 따른 파일 위치 판단
 - `src/app` 내부의 비라우팅 코드 탐지
+- 비표준 import 경고
+- 깊은 상대 경로와 legacy Layer alias를 `@/...` 형태로 자동 수정
+- ESLint import path rewrite 설정 감지 시 자동 수정 skip
 - TypeScript AST 기반 역방향 import 검사
 - 기존 프로젝트의 단계적 구조 migration 안내
 
@@ -54,4 +57,7 @@ plugins/nextjs-app-router/skills/nextjs-layered-architecture/scripts/nextjs-laye
 
 plugins/nextjs-app-router/skills/nextjs-layered-architecture/scripts/nextjs-layered-architecture.sh \
   audit --project <NEXTJS_PROJECT_ROOT>
+
+plugins/nextjs-app-router/skills/nextjs-layered-architecture/scripts/nextjs-layered-architecture.sh \
+  fix-imports --project <NEXTJS_PROJECT_ROOT> --dry-run
 ```

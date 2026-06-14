@@ -50,11 +50,58 @@ const REQUIRED_DIRECTORIES = [
 
 const PATH_ALIASES = {
   "@/*": ["./src/*"],
-  "@application/*": ["./src/application/*"],
-  "@infrastructure/*": ["./src/infrastructure/*"],
-  "@presentation/*": ["./src/presentation/*"],
-  "@shared/*": ["./src/shared/*"],
 };
+
+const LEGACY_LAYER_ALIASES = new Map([
+  ["@application", "@/application"],
+  ["@infrastructure", "@/infrastructure"],
+  ["@presentation", "@/presentation"],
+  ["@shared", "@/shared"],
+]);
+
+const ESLINT_CONFIG_FILES = [
+  "eslint.config.js",
+  "eslint.config.mjs",
+  "eslint.config.cjs",
+  "eslint.config.ts",
+  "eslint.config.mts",
+  "eslint.config.cts",
+  ".eslintrc",
+  ".eslintrc.json",
+  ".eslintrc.js",
+  ".eslintrc.cjs",
+  ".eslintrc.yaml",
+  ".eslintrc.yml",
+];
+
+const ESLINT_IMPORT_REWRITE_PATTERNS = [
+  {
+    code: "no-relative-import-paths",
+    pattern: /["'`]no-relative-import-paths\/no-relative-import-paths["'`]/,
+    message:
+      "ESLint no-relative-import-paths can rewrite relative import specifiers",
+  },
+  {
+    code: "prefer-alias",
+    pattern: /["'`]prefer-alias\/prefer-alias["'`]/,
+    message: "ESLint prefer-alias can rewrite import specifiers",
+  },
+  {
+    code: "path-alias",
+    pattern: /["'`]path-alias\/(?:no-relative|prefer-alias|enforce)["'`]/,
+    message: "ESLint path-alias rules can rewrite import specifiers",
+  },
+  {
+    code: "module-resolver",
+    pattern: /["'`]module-resolver\/(?:use-alias|prefer-alias)["'`]/,
+    message: "ESLint module-resolver rules can rewrite import specifiers",
+  },
+  {
+    code: "import-path-rewrite",
+    pattern: /\b(?:import-path-rewrite|rewrite-import-paths|prefer-absolute-imports)\b/,
+    message: "ESLint config appears to contain an import path rewrite rule",
+  },
+];
 
 const REQUIRED_LAYER_DIRECTORIES = [
   "src/app",
@@ -131,9 +178,10 @@ function usage() {
     "Usage: nextjs-layered-architecture <command> [options]",
     "",
     "Commands:",
-    "  setup             Create the layered structure and configure path aliases",
+    "  setup             Create the layered structure and configure the @/* alias",
     "  audit             Audit project structure, app thinness, and boundaries",
     "  boundary-check    Check imports between app and architecture layers",
+    "  fix-imports       Rewrite non-canonical imports to @/... imports",
     "",
     "Options:",
     "  --project <path>  Project root. Defaults to the current directory",
@@ -469,7 +517,7 @@ function configureAlias(projectRoot, packageJson, options) {
       updated: null,
       warning:
         `${path.basename(configPath)} contains comments or trailing commas; ` +
-        "configure path aliases manually or use --force to rewrite it as JSON",
+        "configure the @/* alias manually or use --force to rewrite it as JSON",
     };
   }
 
@@ -705,6 +753,8 @@ function collectImportEdges(ts, sourceFile) {
       specifier,
       line: position.line + 1,
       column: position.character + 1,
+      start: node.getStart(sourceFile),
+      end: node.getEnd(),
     });
   }
 
@@ -813,6 +863,112 @@ function resolveImport(projectRoot, importerFile, specifier) {
   return null;
 }
 
+function isDeepRelativeImport(specifier) {
+  return /^(?:\.\.\/){2,}/.test(specifier);
+}
+
+function isWithinDirectory(parent, child) {
+  const relative = path.relative(parent, child);
+  return Boolean(relative) && !relative.startsWith("..") && !path.isAbsolute(relative);
+}
+
+function resolveAliasReplacement(projectRoot, importerFile, specifier) {
+  if (!isDeepRelativeImport(specifier)) return null;
+  if (specifier.includes("?") || specifier.includes("#")) return null;
+
+  const sourceRoot = path.join(projectRoot, "src");
+  const rawTarget = path.resolve(path.dirname(importerFile), specifier);
+  const importedFile = resolveFile(rawTarget);
+  if (!importedFile || !isWithinDirectory(sourceRoot, importedFile)) return null;
+
+  const aliasTarget = rawTarget;
+  const aliasPath = relativePath(sourceRoot, aliasTarget);
+  if (aliasPath === "." || aliasPath.startsWith("../")) return null;
+
+  return `@/${aliasPath}`;
+}
+
+function resolveLegacyLayerAliasReplacement(specifier) {
+  for (const [legacyAlias, rootAlias] of LEGACY_LAYER_ALIASES) {
+    if (specifier === legacyAlias || specifier.startsWith(`${legacyAlias}/`)) {
+      return `${rootAlias}${specifier.slice(legacyAlias.length)}`;
+    }
+  }
+
+  return null;
+}
+
+function resolveImportStyleReplacement(projectRoot, importerFile, specifier) {
+  const legacyAliasReplacement = resolveLegacyLayerAliasReplacement(specifier);
+  if (legacyAliasReplacement) {
+    return {
+      code: "non-canonical-layer-import",
+      to: legacyAliasReplacement,
+    };
+  }
+
+  const aliasReplacement = resolveAliasReplacement(
+    projectRoot,
+    importerFile,
+    specifier,
+  );
+  if (aliasReplacement) {
+    return {
+      code: "deep-relative-import",
+      to: aliasReplacement,
+    };
+  }
+
+  return null;
+}
+
+function lineNumberAt(text, index) {
+  return text.slice(0, index).split(/\r?\n/).length;
+}
+
+function readEslintConfigText(configPath) {
+  if (!fs.existsSync(configPath)) return null;
+
+  if (path.basename(configPath) === "package.json") {
+    try {
+      const packageJson = JSON.parse(fs.readFileSync(configPath, "utf8"));
+      if (!packageJson.eslintConfig) return null;
+      return JSON.stringify(packageJson.eslintConfig, null, 2);
+    } catch {
+      return null;
+    }
+  }
+
+  return fs.readFileSync(configPath, "utf8");
+}
+
+function findEslintImportRewriteConfig(projectRoot) {
+  const configPaths = ESLINT_CONFIG_FILES.map((file) =>
+    path.join(projectRoot, file),
+  );
+  configPaths.push(path.join(projectRoot, "package.json"));
+
+  const findings = [];
+  for (const configPath of configPaths) {
+    const text = readEslintConfigText(configPath);
+    if (!text) continue;
+
+    for (const rule of ESLINT_IMPORT_REWRITE_PATTERNS) {
+      const match = text.match(rule.pattern);
+      if (!match || match.index === undefined) continue;
+
+      findings.push({
+        file: relativePath(projectRoot, configPath),
+        line: lineNumberAt(text, match.index),
+        code: rule.code,
+        message: rule.message,
+      });
+    }
+  }
+
+  return findings;
+}
+
 function runBoundaryCheck(projectRoot) {
   const root = path.resolve(projectRoot);
   const ts = loadTypeScript(root);
@@ -862,6 +1018,157 @@ function runBoundaryCheck(projectRoot) {
   }
 
   return violations;
+}
+
+function runImportStyleCheck(projectRoot) {
+  const root = path.resolve(projectRoot);
+  const ts = loadTypeScript(root);
+  const violations = [];
+
+  for (const file of walkFiles(path.join(root, "src"))) {
+    if (!isSourceFile(file)) continue;
+
+    const sourceText = fs.readFileSync(file, "utf8");
+    const extension = path.extname(file);
+    const scriptKind =
+      extension === ".tsx"
+        ? ts.ScriptKind.TSX
+        : extension === ".jsx"
+          ? ts.ScriptKind.JSX
+          : extension === ".js" || extension === ".mjs" || extension === ".cjs"
+            ? ts.ScriptKind.JS
+            : ts.ScriptKind.TS;
+    const sourceFile = ts.createSourceFile(
+      file,
+      sourceText,
+      ts.ScriptTarget.Latest,
+      true,
+      scriptKind,
+    );
+
+    for (const edge of collectImportEdges(ts, sourceFile)) {
+      const replacement = resolveImportStyleReplacement(root, file, edge.specifier);
+      if (!replacement) continue;
+
+      violations.push({
+        file: relativePath(root, file),
+        line: edge.line,
+        column: edge.column,
+        specifier: edge.specifier,
+        replacement: replacement.to,
+        code: replacement.code,
+      });
+    }
+  }
+
+  return violations;
+}
+
+function fixImportsProject(options) {
+  const projectRoot = path.resolve(options.project);
+  const result = {
+    command: "fix-imports",
+    project: projectRoot,
+    changed: [],
+    fixes: [],
+    warnings: [],
+    errors: [],
+    skipped: false,
+    dryRun: options.dryRun,
+  };
+
+  const eslintImportRewriteConfig = findEslintImportRewriteConfig(projectRoot);
+  if (eslintImportRewriteConfig.length > 0 && !options.force) {
+    result.skipped = true;
+    result.warnings.push({
+      code: "eslint-import-rewrite-config",
+      message:
+        "ESLint import path rewrite settings were found. Skipped fix-imports to avoid save-time conflicts. Use --force to override.",
+      matches: eslintImportRewriteConfig,
+    });
+    return result;
+  }
+
+  let ts;
+  try {
+    ts = loadTypeScript(projectRoot);
+  } catch (error) {
+    result.errors.push({
+      code: "fix-imports-unavailable",
+      message: error instanceof Error ? error.message : String(error),
+    });
+    return result;
+  }
+
+  for (const file of walkFiles(path.join(projectRoot, "src"))) {
+    if (!isSourceFile(file)) continue;
+
+    const sourceText = fs.readFileSync(file, "utf8");
+    const extension = path.extname(file);
+    const scriptKind =
+      extension === ".tsx"
+        ? ts.ScriptKind.TSX
+        : extension === ".jsx"
+          ? ts.ScriptKind.JSX
+          : extension === ".js" || extension === ".mjs" || extension === ".cjs"
+            ? ts.ScriptKind.JS
+            : ts.ScriptKind.TS;
+    const sourceFile = ts.createSourceFile(
+      file,
+      sourceText,
+      ts.ScriptTarget.Latest,
+      true,
+      scriptKind,
+    );
+
+    const replacements = [];
+    for (const edge of collectImportEdges(ts, sourceFile)) {
+      const replacement = resolveImportStyleReplacement(
+        projectRoot,
+        file,
+        edge.specifier,
+      );
+      if (!replacement || replacement.to === edge.specifier) continue;
+
+      replacements.push({
+        start: edge.start + 1,
+        end: edge.end - 1,
+        from: edge.specifier,
+        to: replacement.to,
+        code: replacement.code,
+        line: edge.line,
+        column: edge.column,
+      });
+    }
+
+    if (replacements.length === 0) continue;
+
+    const relativeFile = relativePath(projectRoot, file);
+    result.changed.push(relativeFile);
+    for (const replacement of replacements) {
+      result.fixes.push({
+        file: relativeFile,
+        line: replacement.line,
+        column: replacement.column,
+        from: replacement.from,
+        to: replacement.to,
+        code: replacement.code,
+      });
+    }
+
+    if (!options.dryRun) {
+      let updatedText = sourceText;
+      for (const replacement of replacements.sort((a, b) => b.start - a.start)) {
+        updatedText =
+          updatedText.slice(0, replacement.start) +
+          replacement.to +
+          updatedText.slice(replacement.end);
+      }
+      fs.writeFileSync(file, updatedText);
+    }
+  }
+
+  return result;
 }
 
 function auditProject(options) {
@@ -992,6 +1299,29 @@ function auditProject(options) {
     });
   }
 
+  try {
+    for (const violation of runImportStyleCheck(projectRoot)) {
+      const message =
+        violation.code === "deep-relative-import"
+          ? `Use @/* instead of a deep relative import: ${violation.specifier}`
+          : `Use @/... instead of a non-canonical layer import: ${violation.specifier}`;
+      findings.push({
+        severity: "warning",
+        code: violation.code,
+        message,
+        file: `${violation.file}:${violation.line}:${violation.column}`,
+      });
+    }
+  } catch (error) {
+    if (!findings.some((finding) => finding.code === "boundary-check-unavailable")) {
+      findings.push({
+        severity: "error",
+        code: "import-style-check-unavailable",
+        message: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
   return {
     command: "audit",
     project: projectRoot,
@@ -1095,6 +1425,42 @@ function printBoundary(result) {
   }
 }
 
+function printFixImports(result) {
+  if (result.errors.length > 0) {
+    console.error("Import fix failed:");
+    for (const error of result.errors) console.error(`- ${error.message}`);
+    return;
+  }
+
+  if (result.warnings.length > 0) {
+    console.warn("Warnings:");
+    for (const warning of result.warnings) {
+      console.warn(`- ${warning.message}`);
+      if (warning.matches) {
+        for (const match of warning.matches) {
+          console.warn(`  - ${match.file}:${match.line} ${match.code}`);
+        }
+      }
+    }
+  }
+
+  if (result.skipped) {
+    return;
+  }
+
+  if (result.fixes.length === 0) {
+    console.log("No deep relative imports to fix.");
+    return;
+  }
+
+  console.log(result.dryRun ? "Would rewrite imports:" : "Rewrote imports:");
+  for (const fix of result.fixes) {
+    console.log(
+      `- ${fix.file}:${fix.line}:${fix.column} ${fix.from} -> ${fix.to}`,
+    );
+  }
+}
+
 function main() {
   const { command, options } = parseArgs(process.argv.slice(2));
 
@@ -1126,6 +1492,14 @@ function main() {
     if (result.errors.length > 0 || result.violations.length > 0) {
       process.exitCode = 1;
     }
+    return;
+  }
+
+  if (command === "fix-imports") {
+    const result = fixImportsProject(options);
+    if (options.json) console.log(JSON.stringify(result, null, 2));
+    else printFixImports(result);
+    if (result.errors.length > 0) process.exitCode = 1;
     return;
   }
 

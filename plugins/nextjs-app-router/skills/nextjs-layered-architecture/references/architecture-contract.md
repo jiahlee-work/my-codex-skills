@@ -190,25 +190,21 @@ The contract permits presentation to import infrastructure for a narrow,
 presentation-specific technical need, but do not bypass application ownership
 for normal product flows.
 
-Configure these aliases:
+Configure only the root source alias:
 
 ```json
 {
-  "@/*": ["./src/*"],
-  "@application/*": ["./src/application/*"],
-  "@infrastructure/*": ["./src/infrastructure/*"],
-  "@presentation/*": ["./src/presentation/*"],
-  "@shared/*": ["./src/shared/*"]
+  "@/*": ["./src/*"]
 }
 ```
 
-Use the explicit layer aliases for cross-layer imports:
+Use `@/...` for cross-layer imports:
 
 ```ts
-import Button from "@presentation/components/button";
-import { useSubscriptionHistory } from "@application/hooks/api/payment/use-subscription-history";
-import { paymentApi } from "@infrastructure/apis/payment";
-import { ROUTE_PATHS } from "@shared/constants/route-paths";
+import Button from "@/presentation/components/button";
+import { useSubscriptionHistory } from "@/application/hooks/api/payment/use-subscription-history";
+import { paymentApi } from "@/infrastructure/apis/payment";
+import { ROUTE_PATHS } from "@/shared/constants/route-paths";
 ```
 
 Relative imports are acceptable between small neighboring files:
@@ -217,12 +213,41 @@ Relative imports are acceptable between small neighboring files:
 import { SubscriptionHistoryTable } from "./subscription-history-table";
 ```
 
+Avoid imports that climb two or more parent directories:
+
+```ts
+// Avoid
+import { paymentApi } from "../../../infrastructure/apis/payment";
+
+// Prefer
+import { paymentApi } from "@/infrastructure/apis/payment";
+```
+
+Use `fix-imports` to rewrite resolvable deep relative imports to `@/...`.
+The fixer only changes imports that resolve inside `src`; unresolved paths,
+query/hash specifiers, and paths outside `src` are left untouched.
+
+`fix-imports` also rewrites legacy explicit layer aliases:
+
+```ts
+// Avoid
+import { paymentApi } from "@infrastructure/apis/payment";
+
+// Prefer
+import { paymentApi } from "@/infrastructure/apis/payment";
+```
+
+Conflict rule: if project ESLint configuration already contains a known import
+path rewrite rule, do not run the skill fixer by default. Let ESLint own the
+rewrite, or run `fix-imports --force` only after confirming both tools produce
+the same `@/...` imports.
+
 ## App Router Boundaries
 
 A route entry should delegate:
 
 ```tsx
-import SubscriptionHistoryPage from "@presentation/features/my/subscription/history";
+import SubscriptionHistoryPage from "@/presentation/features/my/subscription/history";
 
 export default function Page() {
   return <SubscriptionHistoryPage />;
@@ -236,7 +261,7 @@ the directory topology is complex.
 Keep route handlers thin as well:
 
 ```ts
-import { getPaymentHistory } from "@application/services/payment/get-payment-history";
+import { getPaymentHistory } from "@/application/services/payment/get-payment-history";
 
 export async function GET() {
   const history = await getPaymentHistory();
