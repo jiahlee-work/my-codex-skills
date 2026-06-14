@@ -1,48 +1,34 @@
-# Agent Run Report
+- Ticket: {{ticketKey}}
+- Jira Source: {{jiraSource}}
+- Branch: {{branchName}}
+- Verification Result: {{verificationResult}}
+- Storybook Status: {{storybookStatus}}
+- Browser Verification Status: {{browserScenarioStatus}}
+- Commit Strategy: {{commitStrategy}}
+- PR Status: {{prStatus}}
+- PR URL: {{prUrl}}
+- Dry Run: {{dryRun}}
 
-## Ticket
-{{ticketKey}}
+### User Implementation Intent
 
-## Jira Source
-{{jiraSource}}
-
-## User Implementation Intent
 {{userImplementationIntent}}
 
-## Branch
-{{branchName}}
+### Changed Files
 
-## Changed Files
 {{changedFiles}}
 
-## Verification Result
-{{verificationResult}}
+### Commit Plan
 
-## Storybook Status
-{{storybookStatus}}
-
-## Browser Verification Status
-{{browserScenarioStatus}}
-
-## Commit Strategy
-{{commitStrategy}}
-
-## Commit Plan
 {{commitPlan}}
 
-## PR Status
-{{prStatus}}
+### Phase Artifacts
 
-PR URL: {{prUrl}}
-
-## Dry Run
-{{dryRun}}
-
-## Phase Artifacts
 {{phaseArtifacts}}
 
-## Remaining Risks
+### Remaining Risks
+
 {{remainingRisks}}
 
-## Execution Notes
+### Execution Notes
+
 {{executionNotes}}

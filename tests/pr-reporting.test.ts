@@ -200,8 +200,7 @@ Show a recoverable login failure message.
 ## Summary
 
 Keep the success path and add a visible login failure message.
-`,
-    "agent-run-report.md": "# Agent Run Report\n"
+`
   };
   if (options.includeVerification !== false) {
     files["verification-report.md"] = `# Verification Report
@@ -297,6 +296,11 @@ describe("pr-reporting", () => {
   it("generates all dry-run artifacts without creating commits or pushing", async () => {
     const { rootDir, repository } = await createRepository();
     const runDir = await writePrReportingRun({ rootDir });
+    await writeFile(
+      path.join(runDir, "agent-run-report.md"),
+      "# Agent Run Report\n\n## Planning\n\n- Status: planning-created\n",
+      "utf8"
+    );
     const context = await loadPrReportingContext({ rootDir, runDir });
     const prerequisites = await inspectPrPrerequisites({
       context,
@@ -343,7 +347,9 @@ describe("pr-reporting", () => {
       "utf8"
     );
     expect(finalReport).toContain("PR URL: not created");
-    expect(finalReport).toContain("## Dry Run\nyes");
+    expect(finalReport).toContain("## Planning\n\n- Status: planning-created");
+    expect(finalReport).toContain("## PR Delivery");
+    expect(finalReport).toContain("- Dry Run: yes");
   });
 
   it("blocks planning when verification failed", async () => {

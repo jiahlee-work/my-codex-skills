@@ -73,7 +73,7 @@ Recheck branch, verification, Storybook, Browser, secret, package, and remote
 conditions. Execute commit, push, and PR creation only after explicit user
 approval.
 
-## 13. Final Reporting
+## 13. PR Delivery Reporting
 
-Finalize the agent-run report with completed checks, remaining risks, gate
-status, and delivery results.
+Update the `PR Delivery` section in the shared agent-run report with completed
+checks, remaining risks, gate status, and delivery results.

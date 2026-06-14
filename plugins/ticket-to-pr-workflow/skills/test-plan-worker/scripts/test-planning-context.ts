@@ -1,5 +1,9 @@
-import { readdir, readFile, stat, writeFile } from "node:fs/promises";
+import { readdir, readFile, stat } from "node:fs/promises";
 import path from "node:path";
+import {
+  readAgentRunReport,
+  updateAgentRunReportSection
+} from "../../../shared/core/agent-run-report.js";
 import { pathExists } from "../../../shared/core/fs.js";
 
 export const testPlanningRequiredFiles = [
@@ -127,32 +131,6 @@ export function inferTicketKey(inputs: TestPlanningInputs, runDir: string): stri
   throw new Error(`Could not infer ticket key from agent run: ${runDir}`);
 }
 
-function replaceMarkdownSection(markdown: string, heading: string, body: string): string {
-  const lines = markdown.trimEnd().split(/\r?\n/);
-  const headingLine = `## ${heading}`;
-  const start = lines.findIndex((line) => line.trim() === headingLine);
-
-  if (start === -1) {
-    return `${markdown.trimEnd()}\n\n${headingLine}\n\n${body.trim()}\n`;
-  }
-
-  let end = lines.length;
-  for (let index = start + 1; index < lines.length; index += 1) {
-    if (/^##\s+/.test(lines[index] ?? "")) {
-      end = index;
-      break;
-    }
-  }
-
-  return [
-    ...lines.slice(0, start),
-    headingLine,
-    "",
-    body.trim(),
-    ...lines.slice(end)
-  ].join("\n").trimEnd() + "\n";
-}
-
 export type TestPlanningReportUpdate = {
   status: "environment-detected" | "approval-required" | "test-plan-created";
   repository: string;
@@ -165,10 +143,7 @@ export async function updateTestPlanningAgentRunReport(
   runDir: string,
   update: TestPlanningReportUpdate
 ): Promise<void> {
-  const reportPath = path.join(runDir, "agent-run-report.md");
-  const existing = (await pathExists(reportPath))
-    ? await readFile(reportPath, "utf8")
-    : "# Agent Run Report\n";
+  const existing = await readAgentRunReport(runDir);
   const artifactOrder = [
     "user-implementation-intent.md",
     "test-environment-report.md",
@@ -218,9 +193,5 @@ ${list(update.missingSetup)}
 - Do not run full lint, typecheck, build, test, or Playwright verification as part of the Test Planning workflow.
 - Do not create branches, commits, pushes, PRs, deployments, or Jira mutations.`;
 
-  await writeFile(
-    reportPath,
-    replaceMarkdownSection(existing, "Test Planning", body),
-    "utf8"
-  );
+  await updateAgentRunReportSection(runDir, "Test Planning", body);
 }

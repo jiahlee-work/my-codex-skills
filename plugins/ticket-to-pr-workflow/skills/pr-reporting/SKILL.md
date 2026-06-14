@@ -25,7 +25,7 @@ statuses are resolved, and `changed-files.json`, `diff-summary.md`, and
 - `commit-plan.md`
 - `pr-description.md`
 - `pr-plan.md`
-- Final `agent-run-report.md`
+- Updated `PR Delivery` section in `agent-run-report.md`
 
 ## Main Steps
 

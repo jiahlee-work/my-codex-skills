@@ -10,7 +10,7 @@ order and approval gates using the Codex App conversation,
 user intent, target repository, and active-run state.
 
 **Outputs:** Staged artifact flow, clarification, approval, and skip states,
-the final approval gate, and agent-run report updates.
+the final approval gate, and shared agent-run report section updates.
 
 **Does not own:** Duplicate child skill implementation, unapproved repository
 mutation, commit, push, or PR execution.
@@ -24,8 +24,9 @@ in Codex `config.toml`, then normalizes ticket context and readiness.
 direct Jira ticket key for issue-detail lookup, or context provided by the
 parent's Manual Ticket Intake for normalization into the same ticket-like shape.
 
-**Outputs:** `assigned-ticket-list.json`, `ticket-context-report.md`, and
-normalized ticket metadata.
+**Outputs:** `ticket-context-report.md` and normalized ticket metadata after a
+ticket is selected. Pre-selection ticket lists stay in conversation state and
+active-run state unless diagnostic persistence is explicitly enabled.
 
 **Does not own:** Jira mutation, automatic space selection, or implementation
 work.
@@ -122,8 +123,9 @@ runtime.
 `implementation-summary.md`, `verification-report.md`, and an optional
 Storybook report.
 
-**Outputs:** `browser-scenario-plan.md`, `browser-verification-report.md`, and
-Browser Verification status updates for the PR and agent-run reports.
+**Outputs:** `browser-scenario-plan.md`, `browser-verification-report.md`, PR
+plan status updates when a PR plan exists, and the Browser Verification section
+in the shared agent-run report.
 
 **Does not own:** A local MCP client, Playwright installation, a project-level
 Playwright fallback runner, or production mutation.
@@ -138,7 +140,7 @@ gate after final approval.
 Storybook and Browser Verification reports.
 
 **Outputs:** `commit-plan.md`, `pr-description.md`, `pr-plan.md`, and the final
-`agent-run-report.md`.
+`PR Delivery` section in `agent-run-report.md`.
 
 **Does not own:** Commit, push, or PR execution without approval, or code, test,
 or package changes.

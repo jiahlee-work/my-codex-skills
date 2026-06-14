@@ -62,10 +62,11 @@ ticket context, local paths, and temporary execution data.
 
 ## Artifact Flow
 
-Each selected ticket run writes cumulative artifacts under
-`.agent-runs/{ticketKey}-{timestamp}/`. Later stages read earlier outputs and
-append reports, so the parent can resume safely from the latest complete
-boundary.
+Each selected ticket run writes phase artifacts under
+`.agent-runs/{ticketKey}-{timestamp}/`. Pre-selection ticket lists do not create
+run directories by default; they remain in conversation state and active-run
+state. Later stages read earlier outputs and update their section in the shared
+`agent-run-report.md`.
 
 Planning creates ticket context, requirement, task spec, critic, user intent,
 test, and branch/commit artifacts. Branch Preparation then confirms a validated

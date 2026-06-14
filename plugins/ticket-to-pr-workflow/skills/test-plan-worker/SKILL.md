@@ -22,7 +22,7 @@ artifacts under `.agent-runs/{ticketKey}-{timestamp}/`.
 - `test-environment-report.md`
 - `test-plan.md` when setup exists or the user approves a proposed stack
 - `test-setup-proposal.md` when setup is missing or insufficient
-- Updated `agent-run-report.md`
+- Updated `Test Planning` section in `agent-run-report.md`
 
 ## Main Steps
 
@@ -32,7 +32,7 @@ artifacts under `.agent-runs/{ticketKey}-{timestamp}/`.
 4. Write the environment report.
 5. Write a setup proposal and stop for approval when setup is insufficient.
 6. Generate the test plan after setup is available or explicitly approved.
-7. Update the agent run report and stop before code changes.
+7. Update the shared agent run report and stop before code changes.
 
 ## Safety Rules
 

@@ -26,6 +26,7 @@ task planning, branch planning, test environment, and test plan artifacts.
 - `changed-files.json`
 - `risk-detection-report.md` when risk detection runs
 - Optional `test-change-summary.md`
+- Updated `Ticket Code Work` section in `agent-run-report.md`
 
 ## Main Steps
 

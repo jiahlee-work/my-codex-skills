@@ -53,8 +53,7 @@ Implement the login form error state.
 - A failed login shows an inline error.
 `,
     "plan-critic-report.md": "# Plan Critic Report\n\n## Risks\n\n- None\n",
-    "branch-commit-plan.md": "# Branch And Commit Plan\n",
-    "agent-run-report.md": "# Agent Run Report\n"
+    "branch-commit-plan.md": "# Branch And Commit Plan\n"
   };
 
   await Promise.all(
@@ -132,8 +131,11 @@ describe("test-plan-worker", () => {
     expect(await readFile(path.join(runDir, "test-plan.md"), "utf8")).toContain(
       "## Test Cases"
     );
-    expect(await readFile(path.join(runDir, "agent-run-report.md"), "utf8")).toContain(
-      "Status: test-plan-created"
+    const agentRunReport = await readFile(
+      path.join(runDir, "agent-run-report.md"),
+      "utf8"
     );
+    expect(agentRunReport).toContain("## Test Planning");
+    expect(agentRunReport).toContain("Status: test-plan-created");
   });
 });

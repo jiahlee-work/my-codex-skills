@@ -1,6 +1,7 @@
 import { readFile, stat } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { updateAgentRunReportSection } from "../../../shared/core/agent-run-report.js";
 import { extractMarkdownSection, markdownList } from "../../../shared/core/markdown.js";
 import { pathExists, writeJsonFile, writeTextFile } from "../../../shared/core/fs.js";
 import { isProtectedBranch, parsePorcelainStatus, runGit } from "../../../shared/core/git-worktree.js";
@@ -689,10 +690,6 @@ export async function updateImplementationAgentRunReport(options: {
   diff: DiffCollection;
   risk: RiskDetection;
 }): Promise<void> {
-  const reportPath = path.join(options.context.runDir, "agent-run-report.md");
-  const existing = (await pathExists(reportPath))
-    ? await readFile(reportPath, "utf8")
-    : "# Agent Run Report\n";
   const artifactOrder = [
     "implementation-summary.md",
     "code-review-report.md",
@@ -711,9 +708,7 @@ export async function updateImplementationAgentRunReport(options: {
     .filter((item) => item.exists)
     .map((item) => `- ${item.fileName}`)
     .join("\n");
-  const section = `## Ticket Code Work
-
-- Status: ${options.risk.shouldStop ? "risk-stop-required" : "implementation-reported"}
+  const body = `- Status: ${options.risk.shouldStop ? "risk-stop-required" : "implementation-reported"}
 - Updated at: ${new Date().toISOString()}
 - Branch: ${options.diff.branchName}
 - Changed files: ${options.diff.changedFiles.length}
@@ -729,10 +724,9 @@ ${artifacts || "- None"}
 - Full verification was not run.
 - No commit, push, PR, Jira mutation, or Playwright MCP run was created.
 `;
-  const start = existing.indexOf("## Ticket Code Work");
-  const updated =
-    start >= 0
-      ? `${existing.slice(0, start).trimEnd()}\n\n${section}`
-      : `${existing.trimEnd()}\n\n${section}`;
-  await writeTextFile(options.context.runDir, "agent-run-report.md", updated);
+  await updateAgentRunReportSection(
+    options.context.runDir,
+    "Ticket Code Work",
+    body
+  );
 }

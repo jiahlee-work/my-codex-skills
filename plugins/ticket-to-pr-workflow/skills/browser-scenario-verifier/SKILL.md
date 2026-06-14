@@ -32,7 +32,8 @@ Optional:
 
 - `browser-scenario-plan.md`
 - `browser-verification-report.md`
-- Updated `pr-plan.md` and `agent-run-report.md` when present
+- Updated `pr-plan.md` when present and `Browser Scenario Verification`
+  section in `agent-run-report.md`
 
 ## Main Steps
 
@@ -47,7 +48,7 @@ Optional:
 → `CREATE_BROWSER_SCENARIO_PLAN_IF_NEEDED`
 → `RECORD_BROWSER_VERIFICATION_RESULT_OR_SKIPPED_REASON`
 → `UPDATE_PR_PLAN_WITH_BROWSER_STATUS`
-→ `UPDATE_AGENT_RUN_REPORT`
+→ `UPDATE_AGENT_RUN_REPORT_SECTION`
 → `STOP_BEFORE_FINAL_PR_EXECUTION`
 
 ## Safety Rules

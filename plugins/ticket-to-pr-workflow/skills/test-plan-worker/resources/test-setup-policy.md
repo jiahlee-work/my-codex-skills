@@ -12,5 +12,5 @@ When setup is missing or insufficient:
 4. Do not finalize `test-plan.md` until the setup is available or the user has
    approved a proposed stack.
 
-Record the approved stack and any approved setup changes in
+Record the approved stack in `test-setup-proposal.md` and the shared
 `agent-run-report.md`.

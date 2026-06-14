@@ -8,9 +8,13 @@ Use one run directory for the complete selected-ticket workflow:
 
 ## Artifact Groups
 
+Do not create a run directory for pre-selection ticket lists. Keep assigned
+ticket choices in conversation state and `.agent-runs/.active-run.json`.
+Diagnostic intake and failure runs are opt-in with
+`TICKET_TO_PR_PERSIST_INTAKE_RUNS=1`.
+
 ### Ticket Context
 
-- `assigned-ticket-list.json`
 - `ticket-context-report.md`
 
 Persist summary-level Jira metadata and parsed acceptance criteria only. Do not
@@ -59,13 +63,17 @@ persist full Jira descriptions, comments, secrets, or tokens by default.
 
 ## Cumulative Reporting
 
-Each child skill reuses the selected run directory and appends its result to
-`agent-run-report.md`. Record generated artifacts, approvals, skipped gates,
-verification status, remaining risks, execution status, and the PR URL when a
-PR is created.
+Each child skill reuses the selected run directory and updates one shared
+`agent-run-report.md`. The report must be organized by skill or phase sections:
+`Ticket Context`, `Planning`, `Test Planning`, `Ticket Code Work`,
+`Local Verification`, `Storybook Verification`,
+`Browser Scenario Verification`, and `PR Delivery`.
 
-Final PR reporting must include local, Storybook, and Browser Verification
-statuses and links to the relevant artifacts.
+Do not create per-skill run-report files. Machine-readable artifacts such as
+`changed-files.json` and `logs/verification-summary.json` may remain separate.
+Final PR reporting must update the `PR Delivery` section with local,
+Storybook, and Browser Verification statuses, remaining risks, execution
+status, and the PR URL when a PR is created.
 
 Keep `ticket-context-report.md` in the section order defined by
 `skills/jira-ticket-context/resources/ticket-context-report-template.md`.

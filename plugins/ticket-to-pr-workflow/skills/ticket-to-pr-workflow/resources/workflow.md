@@ -128,7 +128,7 @@ Sequence:
 5. Keep all outputs dry-run and stop for final approval.
 6. On explicit final approval, recheck every gate.
 7. Execute commit, push, and PR creation only when all checks pass.
-8. Finalize `agent-run-report.md`.
+8. Update the `PR Delivery` section in `agent-run-report.md`.
 
 Sequence:
 

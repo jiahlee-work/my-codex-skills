@@ -1,6 +1,7 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { updateAgentRunReportSection } from "../../../shared/core/agent-run-report.js";
 import { extractMarkdownSection, markdownList } from "../../../shared/core/markdown.js";
 import { pathExists, writeTextFile } from "../../../shared/core/fs.js";
 import type { BrowserChangedFile, BrowserContext } from "./browser-context.js";
@@ -590,7 +591,6 @@ async function updateBrowserReports(options: {
     );
   }
 
-  const agentReportPath = path.join(options.context.runDir, "agent-run-report.md");
   const body = `- Browser Verification Status: ${options.report.status}
 - Updated at: ${new Date().toISOString()}
 - Execution Path: ${options.report.executionPath}
@@ -604,8 +604,8 @@ ${options.report.prExecutionImpact}
 ### Browser Verification Boundary
 
 - No commit, push, PR, GitHub Actions check, production access, Jira mutation, payment, email, destructive data change, unapproved staging access, unapproved test account use, secret read, local MCP client, Playwright installation, or project Playwright fallback runner was performed.`;
-  await replaceOrAddMarkdownSection(
-    agentReportPath,
+  await updateAgentRunReportSection(
+    options.context.runDir,
     "Browser Scenario Verification",
     body
   );

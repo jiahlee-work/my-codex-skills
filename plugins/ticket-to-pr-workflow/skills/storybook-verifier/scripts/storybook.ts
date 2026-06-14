@@ -10,6 +10,7 @@ import {
 import path from "node:path";
 import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
+import { updateAgentRunReportSection } from "../../../shared/core/agent-run-report.js";
 import { pathExists, writeJsonFile, writeTextFile } from "../../../shared/core/fs.js";
 import { markdownList } from "../../../shared/core/markdown.js";
 import type {
@@ -1583,10 +1584,6 @@ export async function updateStorybookReports(options: {
     await writeFile(prPlanPath, updated, "utf8");
   }
 
-  const reportPath = path.join(options.context.runDir, "agent-run-report.md");
-  const existing = (await pathExists(reportPath))
-    ? await readFile(reportPath, "utf8")
-    : "# Agent Run Report\n";
   const body = `- Storybook Status: ${options.status}
 - Updated at: ${new Date().toISOString()}
 - Environment: ${options.environment.status}
@@ -1620,10 +1617,10 @@ ${prExecutionImpact(options.status)}
 - Do not commit, push, or create a PR.
 - Do not inspect GitHub Actions or access production.
 - Do not run browser scenario verification in this phase.`;
-  await writeFile(
-    reportPath,
-    replaceMarkdownSection(existing, "Storybook Verification", body),
-    "utf8"
+  await updateAgentRunReportSection(
+    options.context.runDir,
+    "Storybook Verification",
+    body
   );
 }
 

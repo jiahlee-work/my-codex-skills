@@ -2,9 +2,9 @@ import {
   createAgentRunDir,
   relativeToProject
 } from "../../../shared/core/artifact-path.js";
+import { updateAgentRunReportSection } from "../../../shared/core/agent-run-report.js";
 import {
   readJsonFile,
-  writeJsonFile,
   writeTextFile
 } from "../../../shared/core/fs.js";
 import {
@@ -20,7 +20,6 @@ import {
   type Classification,
   parseInputPathArg,
   parseTicketKeyArg,
-  sanitizedCollection,
   type TicketCollection,
   writeTicketProcessingFailureRun
 } from "../../jira-ticket-context/scripts/ticket-source.js";
@@ -201,49 +200,55 @@ ${
 `;
 }
 
-function renderAgentRunReport(
+function renderTicketContextRunSection(
   collection: TicketCollection,
   ticket: NormalizedTicket,
-  classification: Classification,
-  runDir: string
+  classification: Classification
 ): string {
-  return `# Agent Run Report
-
-## Run
-
+  return `- Status: selected
+- Updated at: ${new Date().toISOString()}
 - Ticket: ${ticket.key}
 - Title: ${ticket.title}
-- Generated at: ${new Date().toISOString()}
-- Artifact path: ${relativeToProject(runDir)}
-
-## Source
-
-- Ticket Source: ${ticket.source}
-- Jira Read Mode: ${ticket.source === "jira" ? "read-only" : "not used"}
-- Jira Mutation: ${ticket.source === "jira" ? "disabled" : "not used"}
-- Jira Space: ${ticket.source === "jira" ? displayTicketSpace(ticket) : "not used"}
+- Source: ${ticket.source}
+- Jira read mode: ${ticket.source === "jira" ? "read-only" : "not used"}
+- Jira mutation: ${ticket.source === "jira" ? "disabled" : "not used"}
+- Jira space: ${ticket.source === "jira" ? displayTicketSpace(ticket) : "not used"}
 - Assignee: ${displayTicketAssignee(ticket)}
-
-## Result
-
 - Readiness: ${classification.readiness}
-- Approval mode: ${classification.recommendedApprovalMode}
-- Verification mode: ${classification.recommendedVerificationMode}
-
-## Jira Metadata
-
 - JQL: ${collection.jira?.jql ?? "not used"}
 - Search tool: ${collection.jira?.searchTool ?? "not used"}
 
-## Planning Exclusions
+### Generated Artifacts
 
-- Jira ticket mutation.
-- Jira comments or status changes.
-- Assignee, sprint, or field updates.
-- Product code implementation.
-- Branch, commit, or PR creation.
-- Playwright MCP execution.
-`;
+- ticket-context-report.md
+
+### Boundary
+
+- Jira ticket mutation was not performed.
+- Jira comments, status changes, assignee changes, sprint changes, and field updates were not performed.`;
+}
+
+function renderPlanningRunSection(
+  ticket: NormalizedTicket,
+  classification: Classification
+): string {
+  return `- Status: planning-created
+- Updated at: ${new Date().toISOString()}
+- Ticket: ${ticket.key}
+- Approval mode: ${classification.recommendedApprovalMode}
+- Verification mode: ${classification.recommendedVerificationMode}
+
+### Generated Artifacts
+
+- requirement-summary.md
+- task-spec.md
+- plan-critic-report.md
+- branch-commit-plan.md
+
+### Planning Boundary
+
+- Product code implementation was not performed.
+- Branch creation, commit creation, PR creation, deployment, and Playwright MCP execution were not performed.`;
 }
 
 async function main(): Promise<void> {
@@ -279,7 +284,6 @@ async function main(): Promise<void> {
   }
 
   const runDir = await createAgentRunDir(ticketKey);
-  await writeJsonFile(runDir, "assigned-ticket-list.json", sanitizedCollection(collection));
   await writeTextFile(
     runDir,
     "ticket-context-report.md",
@@ -305,10 +309,15 @@ async function main(): Promise<void> {
     "branch-commit-plan.md",
     renderBranchCommitPlan(selectedTicket)
   );
-  await writeTextFile(
+  await updateAgentRunReportSection(
     runDir,
-    "agent-run-report.md",
-    renderAgentRunReport(collection, selectedTicket, selectedClassification, runDir)
+    "Ticket Context",
+    renderTicketContextRunSection(collection, selectedTicket, selectedClassification)
+  );
+  await updateAgentRunReportSection(
+    runDir,
+    "Planning",
+    renderPlanningRunSection(selectedTicket, selectedClassification)
   );
 
   console.log(
@@ -318,7 +327,6 @@ async function main(): Promise<void> {
         source: collection.source,
         outputDir: relativeToProject(runDir),
         files: [
-          "assigned-ticket-list.json",
           "ticket-context-report.md",
           "requirement-summary.md",
           "task-spec.md",

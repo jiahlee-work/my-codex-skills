@@ -10,6 +10,7 @@ import {
 } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { updateAgentRunReportSection } from "../../../shared/core/agent-run-report.js";
 import { pathExists, readJsonFile, writeJsonFile, writeTextFile } from "../../../shared/core/fs.js";
 import type { VerificationContext } from "./verification-context.js";
 
@@ -864,35 +865,17 @@ export async function readVerificationSummary(
   return readJsonFile<VerificationSummary>(summaryPath);
 }
 
-function replaceVerificationSection(existing: string, section: string): string {
-  const heading = "## Local Verification";
-  const start = existing.indexOf(heading);
-  if (start < 0) {
-    return `${existing.trimEnd()}\n\n${section}`;
-  }
-  const nextHeading = existing.indexOf("\n## ", start + heading.length);
-  return nextHeading < 0
-    ? `${existing.slice(0, start).trimEnd()}\n\n${section}`
-    : `${existing.slice(0, start).trimEnd()}\n\n${section}\n${existing.slice(nextHeading + 1)}`;
-}
-
 export async function updateVerificationAgentRunReport(
   context: VerificationContext,
   summary: VerificationSummary
 ): Promise<void> {
-  const reportPath = path.join(context.runDir, "agent-run-report.md");
-  const existing = (await pathExists(reportPath))
-    ? await readFile(reportPath, "utf8")
-    : "# Agent Run Report\n";
   const artifacts = [
     "verification-report.md",
     ...(summary.result === "failed" ? ["failure-report.md"] : []),
     "logs/verification-summary.json",
     ...summary.commands.flatMap((command) => (command.log ? [command.log] : []))
   ];
-  const section = `## Local Verification
-
-- Status: ${summary.result}
+  const section = `- Status: ${summary.result}
 - Updated at: ${new Date().toISOString()}
 - Verification mode: ${summary.verificationMode}
 - Recommended mode: ${summary.recommendedMode}
@@ -908,11 +891,7 @@ ${markdownList(artifacts)}
 - No code, test, dependency, package, lockfile, or configuration changes were made.
 - No commit, push, PR, GitHub Actions check, Jira mutation, or Playwright MCP run was performed.
 `;
-  await writeTextFile(
-    context.runDir,
-    "agent-run-report.md",
-    replaceVerificationSection(existing, section)
-  );
+  await updateAgentRunReportSection(context.runDir, "Local Verification", section);
 }
 
 export async function generateVerificationReports(

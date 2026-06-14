@@ -19,7 +19,9 @@ Use after `jira-ticket-context` selects and classifies a ticket.
 - `requirement-summary.md`
 - `task-spec.md`
 - `plan-critic-report.md`
-- Complete planning report set through the generator script
+- `ticket-context-report.md`
+- `branch-commit-plan.md`
+- Updated `Ticket Context` and `Planning` sections in `agent-run-report.md`
 
 ## Main Steps
 

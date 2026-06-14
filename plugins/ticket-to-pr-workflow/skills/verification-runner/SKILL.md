@@ -23,7 +23,7 @@ complete.
 - `failure-report.md` when verification fails
 - `logs/{lint,typecheck,test,build}.log` for commands that run
 - `logs/verification-summary.json`
-- Updated `agent-run-report.md`
+- Updated `Local Verification` section in `agent-run-report.md`
 
 ## Main Steps
 
@@ -34,7 +34,8 @@ complete.
 4. Resolve package scripts and TypeScript fallback commands.
 5. Run commands sequentially, collect logs, and stop after failure by default.
 6. Analyze failures before any allowed retry.
-7. Generate reports, update the agent run, and stop before commit.
+7. Generate reports, update the shared agent run report, and stop before
+   commit.
 
 Workflow:
 
@@ -51,7 +52,7 @@ Workflow:
 → `RETRY_IF_ALLOWED`
 → `GENERATE_VERIFICATION_REPORT`
 → `GENERATE_FAILURE_REPORT_IF_FAILED`
-→ `UPDATE_AGENT_RUN_REPORT`
+→ `UPDATE_AGENT_RUN_REPORT_SECTION`
 → `STOP_BEFORE_COMMIT`
 
 ## Safety Rules

@@ -25,7 +25,8 @@ review, and verification artifacts are ready in one agent run.
 - `storybook-setup-proposal.md` when setup is missing
 - `stories-changed.json` when approved story files are written
 - `storybook-report.md`
-- Updated `pr-plan.md` and `agent-run-report.md`
+- Updated `pr-plan.md` when present and `Storybook Verification` section in
+  `agent-run-report.md`
 
 ## Main Steps
 

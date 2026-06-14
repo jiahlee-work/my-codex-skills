@@ -8,6 +8,7 @@ import {
   validateCommitMessage,
   type CommitType
 } from "../../branch-commit-policy/scripts/branch-commit-policy.js";
+import { updateAgentRunReportSection } from "../../../shared/core/agent-run-report.js";
 import { extractMarkdownSection, markdownList } from "../../../shared/core/markdown.js";
 import { pathExists, writeTextFile } from "../../../shared/core/fs.js";
 import { isProtectedBranch, parsePorcelainStatus, runGit } from "../../../shared/core/git-worktree.js";
@@ -1159,8 +1160,11 @@ export async function finalizeAgentRunReport(options: {
         ? "- No commit, push, PR, remote mutation, or GitHub Actions wait was performed."
         : `- Created ${options.execution.commitHashes.length} commit(s) and pushed the current branch.`
   });
-  await writeTextFile(options.context.runDir, "agent-run-report.md", content);
-  return content;
+  return updateAgentRunReportSection(
+    options.context.runDir,
+    "PR Delivery",
+    content
+  );
 }
 
 async function readAndValidatePlan(context: PrReportingContext): Promise<CommitPlan> {

@@ -5,7 +5,8 @@ import {
   matchJiraSpace,
   normalizeJiraAssignedTicketResponse,
   normalizeJiraTicketDetailResponse,
-  normalizeVisibleJiraSpaces
+  normalizeVisibleJiraSpaces,
+  writeTicketCollectionRun
 } from "../plugins/ticket-to-pr-workflow/skills/jira-ticket-context/scripts/ticket-source.js";
 
 const context = {
@@ -166,5 +167,27 @@ describe("Jira agent response normalization", () => {
         context
       )
     ).toThrow("does not match current Jira user");
+  });
+
+  it("does not persist pre-selection ticket list runs by default", async () => {
+    const collection = normalizeJiraAssignedTicketResponse(
+      { issues: [jiraIssue()] },
+      context
+    );
+    const previous = process.env.TICKET_TO_PR_PERSIST_INTAKE_RUNS;
+    delete process.env.TICKET_TO_PR_PERSIST_INTAKE_RUNS;
+
+    try {
+      const output = await writeTicketCollectionRun("assigned-tickets", collection);
+
+      expect(output).toContain("not persisted");
+      expect(output).toContain("TICKET_TO_PR_PERSIST_INTAKE_RUNS=1");
+    } finally {
+      if (previous === undefined) {
+        delete process.env.TICKET_TO_PR_PERSIST_INTAKE_RUNS;
+      } else {
+        process.env.TICKET_TO_PR_PERSIST_INTAKE_RUNS = previous;
+      }
+    }
   });
 });
