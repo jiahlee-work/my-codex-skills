@@ -7,9 +7,11 @@
    `nextAction`, `blockedBy`, and pending questions.
 3. Start Jira MCP Intake when Jira is configured and the user asks for assigned
    tickets.
-4. Start Manual Ticket Intake when Jira is unavailable or the user supplies a
+4. Start Direct Ticket Key Jira MCP Intake when Jira is configured and the user
+   provides a standalone Jira key such as `ABC-123`.
+5. Start Manual Ticket Intake when Jira is unavailable or the user supplies a
    feature request directly.
-5. Never substitute unrelated ticket data when intake fails.
+6. Never substitute unrelated ticket data when intake fails.
 
 Safe read-only analysis and `.agent-runs` artifact generation may auto-continue.
 Repository mutations, browser actions, delivery actions, and missing
@@ -17,14 +19,19 @@ requirements must stop at their explicit gates.
 
 ## Intake And Context
 
-1. For Jira, list MCP-visible spaces and wait for the user to choose a scope.
+1. For assigned-ticket Jira intake, list MCP-visible spaces and wait for the
+   user to choose a scope.
 2. Read only current-user assigned tickets from the selected space.
 3. Present a numbered ticket list and persist it in active-run state.
 4. Resolve contextual selections against that list.
-5. For manual intake, collect title, requirements, acceptance criteria,
+5. For direct ticket key Jira intake, read the exact issue detail by key,
+   validate the assignee against the current Jira user, and persist
+   `selectedTicketKey`.
+6. For manual intake, collect title, requirements, acceptance criteria,
    constraints, and intended behavior without inventing missing details.
-6. Normalize the selected Jira ticket or manual context.
-7. Generate `ticket-context-report.md` and update the active run.
+7. Normalize the selected Jira ticket, direct-key Jira ticket, or manual
+   context.
+8. Generate `ticket-context-report.md` and update the active run.
 
 ## Intent And Planning
 

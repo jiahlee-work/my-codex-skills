@@ -38,9 +38,13 @@ outside this repository's documentation.
 
 ## Ticket Intake
 
-The parent prefers read-only Jira MCP intake when Jira is configured. It lists
-visible spaces, waits for the user to choose a scope, and reads only tickets
-assigned to the current user in that scope.
+The parent prefers read-only Jira MCP intake when Jira is configured. Jira MCP
+intake has two triggers:
+
+- Assigned ticket selection: list visible spaces, wait for the user to choose a
+  scope, and read only tickets assigned to the current user in that scope.
+- Direct ticket key: detect a standalone Jira key such as `ABC-123`, read that
+  issue detail by exact key, and validate it is assigned to the current user.
 
 If Jira is unavailable or the user supplies a feature request directly, the
 parent can normalize the conversation into manual ticket context. Missing

@@ -7,9 +7,10 @@ order below.
 ## 1. Ticket Intake via Jira MCP
 
 Read assigned tickets through the Jira MCP server registered in Codex
-`config.toml`. Show visible spaces and wait for the user to choose a scope.
-Direct feature requests can enter through the parent's internal Manual Ticket
-Intake policy.
+`config.toml` by showing visible spaces and waiting for the user to choose a
+scope, or accept a standalone direct Jira key such as `ABC-123` and read that
+issue detail by exact key. Direct feature requests can enter through the
+parent's internal Manual Ticket Intake policy.
 
 ## 2. Ticket Context Analysis
 

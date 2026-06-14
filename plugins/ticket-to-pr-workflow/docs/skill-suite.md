@@ -6,8 +6,8 @@
 order and approval gates using the Codex App conversation,
 `.agent-runs/.active-run.json`, and agent-run artifacts.
 
-**Inputs:** Jira selection or manual ticket context, user intent, target
-repository, and active-run state.
+**Inputs:** Jira selection, direct Jira ticket key, or manual ticket context,
+user intent, target repository, and active-run state.
 
 **Outputs:** Staged artifact flow, clarification, approval, and skip states,
 the final approval gate, and agent-run report updates.
@@ -20,9 +20,9 @@ mutation, commit, push, or PR execution.
 **Responsibility:** Reads Jira tickets through the read-only Jira MCP registered
 in Codex `config.toml`, then normalizes ticket context and readiness.
 
-**Inputs:** A user-selected Jira MCP space and an optional ticket key. Context
-provided by the parent's Manual Ticket Intake can also be normalized into the
-same ticket-like shape.
+**Inputs:** A user-selected Jira MCP space for assigned-ticket selection, a
+direct Jira ticket key for issue-detail lookup, or context provided by the
+parent's Manual Ticket Intake for normalization into the same ticket-like shape.
 
 **Outputs:** `assigned-ticket-list.json`, `ticket-context-report.md`, and
 normalized ticket metadata.

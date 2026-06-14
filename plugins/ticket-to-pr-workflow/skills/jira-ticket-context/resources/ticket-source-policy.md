@@ -10,9 +10,17 @@ The Codex App-native parent workflow supports these user-facing intake sources:
 Jira tickets are read through the Jira MCP server registered in Codex
 `config.toml`.
 
-Apply `jira-space-policy.md` for scope resolution and `jira-mcp-policy.md` for
-read-only and assignee rules. Do not choose a space on the user's behalf and do
-not broaden the selected scope when Jira fails.
+Jira source supports two user-facing triggers:
+
+- Assigned ticket selection: apply `jira-space-policy.md` for scope resolution,
+  then read only assigned tickets in the selected space.
+- Direct ticket key: when the parent detects a standalone key such as
+  `ABC-123`, read issue detail by exact key and normalize that single ticket.
+
+Apply `jira-mcp-policy.md` for read-only and assignee rules. Do not choose a
+space on the user's behalf for assigned-ticket selection. Do not broaden the
+selected scope, query all spaces, or substitute unrelated ticket data when Jira
+fails.
 
 ## Manual Source
 

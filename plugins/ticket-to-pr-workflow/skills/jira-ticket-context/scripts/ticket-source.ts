@@ -64,7 +64,7 @@ export type JiraSpace = {
 
 export type JiraAgentContext = {
   currentUser: NormalizedUser;
-  selectedSpace: JiraSpace;
+  selectedSpace?: JiraSpace;
   cloudId?: string;
   siteUrl?: string;
   jql?: string;
@@ -222,11 +222,7 @@ function extractIssuesFromSearchResponse(response: unknown): unknown[] {
   return arrayValue(value.nodes ?? value.values ?? value.results);
 }
 
-function assertAgentContext(context: JiraAgentContext): void {
-  if (!context.selectedSpace.key || !context.selectedSpace.name) {
-    throw new Error("Jira normalization requires the user-selected Jira space.");
-  }
-
+function assertCurrentUserContext(context: JiraAgentContext): void {
   if (
     !context.currentUser.accountId &&
     !context.currentUser.email &&
@@ -234,6 +230,30 @@ function assertAgentContext(context: JiraAgentContext): void {
   ) {
     throw new Error("Jira normalization requires the current Jira user from MCP.");
   }
+}
+
+function assertSelectedSpaceContext(context: JiraAgentContext): JiraSpace {
+  if (!context.selectedSpace?.key || !context.selectedSpace.name) {
+    throw new Error("Jira normalization requires the user-selected Jira space.");
+  }
+
+  return context.selectedSpace;
+}
+
+function assertAgentContext(context: JiraAgentContext): JiraSpace {
+  assertCurrentUserContext(context);
+  return assertSelectedSpaceContext(context);
+}
+
+function ticketSpace(ticket: NormalizedTicket): JiraSpace | undefined {
+  if (!ticket.space?.key || !ticket.space.name) {
+    return undefined;
+  }
+
+  return {
+    key: ticket.space.key,
+    name: ticket.space.name
+  };
 }
 
 function assertTicketWithinScope(
@@ -258,12 +278,24 @@ function assertAssigneeMatchesCurrentUser(
   }
 }
 
-function createJiraMetadata(context: JiraAgentContext): JiraRunMetadata {
+function createJiraMetadata(
+  context: JiraAgentContext,
+  options: {
+    defaultAssignedJql?: boolean;
+    selectedSpace?: JiraSpace;
+  } = {}
+): JiraRunMetadata {
+  const selectedSpace = options.selectedSpace ?? context.selectedSpace;
+
   return {
     cloudId: context.cloudId,
     siteUrl: context.siteUrl,
-    jql: context.jql ?? buildAssignedJql(context.selectedSpace.key),
-    selectedSpace: context.selectedSpace,
+    jql:
+      context.jql ??
+      (options.defaultAssignedJql && selectedSpace
+        ? buildAssignedJql(selectedSpace.key)
+        : undefined),
+    selectedSpace,
     grantedScopes: context.grantedScopes ?? [],
     readMode: "read-only",
     mutation: "disabled",
@@ -445,18 +477,18 @@ export function normalizeJiraAssignedTicketResponse(
   response: unknown,
   context: JiraAgentContext
 ): TicketCollection {
-  assertAgentContext(context);
+  const selectedSpace = assertAgentContext(context);
   const issues = extractIssuesFromSearchResponse(response);
 
   if (issues.length === 0) {
     throw new Error(
-      `No assigned Jira tickets found in the selected space ${context.selectedSpace.key}.`
+      `No assigned Jira tickets found in the selected space ${selectedSpace.key}.`
     );
   }
 
   const tickets = issues.map(normalizeJiraIssue);
   tickets.forEach((ticket) => {
-    assertTicketWithinScope(ticket, context.selectedSpace);
+    assertTicketWithinScope(ticket, selectedSpace);
     assertAssigneeMatchesCurrentUser(ticket, context.currentUser);
   });
 
@@ -466,7 +498,10 @@ export function normalizeJiraAssignedTicketResponse(
     count: tickets.length,
     tickets,
     currentUser: context.currentUser,
-    jira: createJiraMetadata(context)
+    jira: createJiraMetadata(context, {
+      defaultAssignedJql: true,
+      selectedSpace
+    })
   };
 }
 
@@ -474,9 +509,17 @@ export function normalizeJiraTicketDetailResponse(
   response: unknown,
   context: JiraAgentContext
 ): TicketCollection {
-  assertAgentContext(context);
+  assertCurrentUserContext(context);
   const ticket = normalizeJiraIssue(response);
-  assertTicketWithinScope(ticket, context.selectedSpace);
+  const selectedSpace = context.selectedSpace ?? ticketSpace(ticket);
+
+  if (!selectedSpace) {
+    throw new Error(
+      `Jira ticket detail response is missing project metadata: ${ticket.key}.`
+    );
+  }
+
+  assertTicketWithinScope(ticket, selectedSpace);
   assertAssigneeMatchesCurrentUser(ticket, context.currentUser);
 
   return {
@@ -485,7 +528,7 @@ export function normalizeJiraTicketDetailResponse(
     count: 1,
     tickets: [ticket],
     currentUser: context.currentUser,
-    jira: createJiraMetadata(context)
+    jira: createJiraMetadata(context, { selectedSpace })
   };
 }
 
@@ -678,10 +721,22 @@ export function sanitizedCollection(
   };
 }
 
+function persistIntakeRuns(): boolean {
+  return process.env.TICKET_TO_PR_PERSIST_INTAKE_RUNS === "1";
+}
+
+function skippedRunMessage(label: string): string {
+  return `not persisted (${label}; set TICKET_TO_PR_PERSIST_INTAKE_RUNS=1 to write diagnostic run artifacts)`;
+}
+
 export async function writeTicketCollectionRun(
   label: string,
   collection: TicketCollection
 ): Promise<string> {
+  if (!persistIntakeRuns()) {
+    return skippedRunMessage(label);
+  }
+
   const runDir = await createAgentRunDir(label);
   const sanitized = sanitizedCollection(collection);
   await writeJsonFile(runDir, "assigned-ticket-list.json", sanitized);
@@ -710,6 +765,10 @@ export async function writeTicketProcessingFailureRun(
   label: string,
   error: unknown
 ): Promise<string> {
+  if (!persistIntakeRuns()) {
+    return skippedRunMessage(`${label}-error`);
+  }
+
   const runDir = await createAgentRunDir(`${label}-error`);
   const message = error instanceof Error ? error.message : String(error);
 

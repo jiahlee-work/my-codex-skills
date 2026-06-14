@@ -3,6 +3,10 @@
 Use `space` in user-facing documentation. Jira APIs and JQL may expose the same
 object as a project.
 
+This policy applies to the assigned-ticket list trigger. Direct ticket key
+intake uses the exact Jira issue key supplied by the user and does not require
+space selection before reading issue detail.
+
 1. Call Jira MCP `getVisibleJiraProjects`.
 2. For each space, count current-user non-Done tickets with scoped JQL.
 3. Present each space as `{number}. {space name}({key}): {count} tickets`.
@@ -21,7 +25,9 @@ project = "{selectedSpaceKey}" AND assignee = currentUser() AND statusCategory !
 ```
 
 Do not infer a space from environment configuration. Do not query all Jira
-tickets when no space is selected.
+tickets when no space is selected. For direct ticket key intake, derive
+persisted space metadata only from the returned issue detail and stop if the
+issue cannot be read or is not assigned to the current Jira user.
 
 Follow `nextPageToken` when counting so the displayed value is not limited to
 the first 100 tickets. If Jira Search is unavailable, keep the space list and

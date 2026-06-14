@@ -4,6 +4,7 @@ import {
   formatJiraSpaceList,
   matchJiraSpace,
   normalizeJiraAssignedTicketResponse,
+  normalizeJiraTicketDetailResponse,
   normalizeVisibleJiraSpaces
 } from "../plugins/ticket-to-pr-workflow/skills/jira-ticket-context/scripts/ticket-source.js";
 
@@ -105,6 +106,33 @@ describe("Jira agent response normalization", () => {
       mutation: "disabled",
       searchTool: "searchJiraIssuesUsingJql"
     });
+  });
+
+  it("normalizes a directly requested Jira ticket detail without prior space selection", () => {
+    const collection = normalizeJiraTicketDetailResponse(jiraIssue(), {
+      currentUser: context.currentUser,
+      tools: ["atlassianUserInfo", "getJiraIssue"],
+      searchTool: "getJiraIssue",
+      generatedAt: "2026-06-10T00:00:00.000Z"
+    });
+
+    expect(collection.count).toBe(1);
+    expect(collection.tickets[0]).toMatchObject({
+      key: "APP-42",
+      title: "Show a retry action",
+      source: "jira",
+      acceptanceCriteria: ["Retry is visible after a failed request."]
+    });
+    expect(collection.jira).toMatchObject({
+      selectedSpace: {
+        key: "APP",
+        name: "Application"
+      },
+      readMode: "read-only",
+      mutation: "disabled",
+      searchTool: "getJiraIssue"
+    });
+    expect(collection.jira?.jql).toBeUndefined();
   });
 
   it("rejects tickets outside the selected space", () => {

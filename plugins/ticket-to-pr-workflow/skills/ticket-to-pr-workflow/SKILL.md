@@ -13,7 +13,8 @@ artifacts under `.agent-runs`.
 
 ## Inputs
 
-- Jira MCP ticket selection or manual ticket context from the conversation
+- Jira MCP ticket selection, direct Jira ticket key, or manual ticket context
+  from the conversation
 - User implementation intent
 - Target repository
 - Existing active-run state and phase artifacts, when present
@@ -31,9 +32,14 @@ The parent skill supports two intake modes:
 
 1. Jira MCP Intake
    - Use when Jira MCP is available and configured.
-   - Read assigned Jira tickets.
-   - Present a numbered list of tickets.
-   - Resolve the selected ticket into a normalized ticket context.
+   - Support two user-facing triggers:
+     - Assigned ticket selection: read assigned Jira tickets, present a
+       numbered list, and resolve the selected ticket.
+     - Direct ticket key: detect a standalone Jira key such as `ABC-123`, read
+       that issue detail by exact key, and start from the normalized ticket.
+   - For direct ticket keys, do not require the user to first list spaces or
+     choose from assigned tickets.
+   - Validate that the direct-key ticket is assigned to the current Jira user.
 2. Manual Ticket Intake
    - Use when Jira MCP is unavailable, disconnected, or the user provides a
      feature request directly in chat.
@@ -53,6 +59,10 @@ conversation context.
 
 - A reply that refers to a listed ticket, such as "first one", "1", "1번", or
   "첫 번째", resolves against the last displayed ticket list.
+- A reply that is a standalone Jira ticket key matching
+  `[A-Z][A-Z0-9]+-\d+`, such as `ABC-123`, starts Direct Ticket Key Jira MCP
+  Intake when it is not answering a pending approval, branch, or clarification
+  prompt.
 - A reply that indicates continuation, such as "continue", "go ahead",
   "진행해", or "계속해", applies only to the current safe `nextAction`.
 - A reply that indicates approval applies only to the current `blockedBy` gate.
@@ -113,13 +123,15 @@ export type ActiveRunState = {
 
 Refresh `updatedAt`, `currentPhase`, `nextAction`, and `blockedBy` after each
 transition. Preserve the last displayed Jira ticket list until selection is
-resolved or intake is restarted.
+resolved or intake is restarted. Persist direct-key intake by setting
+`selectedTicketKey` without requiring `lastDisplayedTickets`.
 
 ## Auto-Continue Policy
 
-After ticket selection or manual intake, continue through phases without asking
-for confirmation while the next phase only reads files, analyzes context,
-writes `.agent-runs` artifacts, or runs already-approved local checks.
+After ticket selection, direct ticket key resolution, or manual intake, continue
+through phases without asking for confirmation while the next phase only reads
+files, analyzes context, writes `.agent-runs` artifacts, or runs
+already-approved local checks.
 
 Stop only at approval or clarification gates that would mutate repository
 setup, create or switch branches, edit product/test files, run browser actions,
@@ -155,8 +167,9 @@ create `.agent-runs` or apply ticket changes inside the installed plugin.
 
 ## Main Steps
 
-1. Use `jira-ticket-context` for read-only Jira intake and normalized ticket
-   context, or normalize direct chat input through Manual Ticket Intake.
+1. Use `jira-ticket-context` for read-only Jira intake through assigned-ticket
+   selection or direct ticket key detail lookup, or normalize direct chat input
+   through Manual Ticket Intake.
 2. Use `task-spec-planner` for Requirement Summary, Task Spec, and Plan Critic
    Report.
 3. Clarify and record user implementation intent without inventing missing
@@ -175,8 +188,11 @@ create `.agent-runs` or apply ticket changes inside the installed plugin.
 11. Return to `pr-reporting` for final approval-gated commit, push, and PR
     execution, then finalize the Agent Run Report.
 
-For Jira, do not choose a space on the user's behalf. Let
-`jira-ticket-context` list MCP-visible spaces and collect the selection first.
+For Jira assigned-ticket selection, do not choose a space on the user's behalf.
+Let `jira-ticket-context` list MCP-visible spaces and collect the selection
+first. For direct ticket key intake, the exact issue key is the user-selected
+scope; read that issue detail by key and do not query all spaces or broaden the
+search.
 
 ## Related Resources
 

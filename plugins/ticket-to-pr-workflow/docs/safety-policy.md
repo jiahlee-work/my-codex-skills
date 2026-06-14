@@ -30,8 +30,9 @@ uncommitted.
 ## Jira
 
 Jira MCP must be registered in Codex `config.toml` for Jira intake. Its use is
-read-only: show visible spaces, wait for user selection, and read assigned
-tickets only from that scope. Do not mutate tickets, comments, status,
+read-only: either show visible spaces, wait for user selection, and read
+assigned tickets only from that scope, or read one exact issue detail for a
+direct ticket key supplied by the user. Do not mutate tickets, comments, status,
 assignees, or project settings.
 
 If Jira is unavailable, the parent may normalize a direct user request through
