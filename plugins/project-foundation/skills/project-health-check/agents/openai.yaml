@@ -1,4 +1,0 @@
-interface:
-  display_name: "Project Health Check"
-  short_description: "Resolve and run lint, typecheck, test, and build checks."
-  default_prompt: "Use $project-health-check to verify this repository baseline."

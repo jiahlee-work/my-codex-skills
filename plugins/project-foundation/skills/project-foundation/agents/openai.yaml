@@ -1,4 +1,0 @@
-interface:
-  display_name: "Project Foundation"
-  short_description: "Audit and apply reusable repository foundations."
-  default_prompt: "Use $project-foundation to audit this repository and plan the baseline setup."

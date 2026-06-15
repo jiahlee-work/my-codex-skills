@@ -29,10 +29,10 @@
       "category": "Productivity"
     },
     {
-      "name": "project-foundation",
+      "name": "repo-agent-rules",
       "source": {
         "source": "local",
-        "path": "./plugins/project-foundation"
+        "path": "./plugins/repo-agent-rules"
       },
       "policy": {
         "installation": "AVAILABLE",

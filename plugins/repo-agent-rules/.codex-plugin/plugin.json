@@ -1,0 +1,33 @@
+{
+  "name": "repo-agent-rules",
+  "version": "0.1.0+codex.20260615170600",
+  "description": "Install fixed repo-local AGENTS.md and engineering rule docs for coding agents.",
+  "author": {
+    "name": "my-codex-skills contributors"
+  },
+  "repository": "https://github.com/ndnv819/my-codex-skills",
+  "license": "MIT",
+  "keywords": [
+    "agents",
+    "repo-rules",
+    "codex",
+    "engineering-docs",
+    "husky",
+    "commitlint"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Repo Agent Rules",
+    "shortDescription": "Install fixed agent rules.",
+    "longDescription": "Installs a fixed AGENTS.md, fixed engineering rule docs, and minimal Husky/commitlint guardrails. It asks only for project type and main push policy, and does not inspect repository source to generate custom documentation.",
+    "developerName": "my-codex-skills contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use repo-agent-rules to install AGENTS.md and the fixed engineering rule docs in this repository.",
+      "Create AGENTS.md and related docs with repo-agent-rules."
+    ]
+  }
+}

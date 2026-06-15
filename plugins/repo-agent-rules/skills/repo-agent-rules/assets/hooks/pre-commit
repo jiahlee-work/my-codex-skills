@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+set -eu
+
+blocked_files="$(git diff --cached --name-only | grep -E '(^|/)(\.env($|\.)|id_rsa$|id_ed25519$|.*\.(pem|key|p12|pfx)$)' || true)"
+
+if [ -n "$blocked_files" ]; then
+  echo "Blocked commit because staged files look like secrets:"
+  echo "$blocked_files"
+  exit 1
+fi

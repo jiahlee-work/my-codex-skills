@@ -1,0 +1,12 @@
+#!/usr/bin/env sh
+set -eu
+
+if [ -f pnpm-lock.yaml ] && command -v pnpm >/dev/null 2>&1; then
+  pnpm exec commitlint --edit "$1"
+elif { [ -f bun.lockb ] || [ -f bun.lock ]; } && command -v bun >/dev/null 2>&1; then
+  bunx commitlint --edit "$1"
+elif [ -f yarn.lock ] && command -v yarn >/dev/null 2>&1; then
+  yarn commitlint --edit "$1"
+else
+  npx --no -- commitlint --edit "$1"
+fi

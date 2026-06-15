@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Agent Rules"
+  short_description: "Install fixed AGENTS.md and engineering rule docs"
+  default_prompt: "Use $repo-agent-rules to install common agent rules in this repository."

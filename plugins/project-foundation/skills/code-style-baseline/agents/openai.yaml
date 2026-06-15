@@ -1,4 +1,0 @@
-interface:
-  display_name: "Code Style Baseline"
-  short_description: "Install shared React, TypeScript, and Biome style defaults."
-  default_prompt: "Use $code-style-baseline to install the shared code style baseline in this repository."

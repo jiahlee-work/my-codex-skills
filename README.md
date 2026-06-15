@@ -33,17 +33,15 @@ Storybook·Playwright MCP 승인 단계, 실패 분석과 제한적 재시도를
 
 - [상세 설명](plugins/ticket-to-pr-workflow/README.md)
 
-### project-foundation
+### repo-agent-rules
 
-여러 레포에 반복 적용할 기본 개발 환경과 운영 안전장치를 repo-local 파일로
-저장하도록 돕는 skill 모음입니다. `AGENTS.md`와 engineering docs, Next.js
-App Router layered architecture 문서, Biome와 VS Code 설정,
-Husky·commitlint·선택형 branch guard, GitHub Actions CI, 선택형 branch
-protection 가이드, Vitest + React Testing Library, Storybook, local health
-check 기준을
-제공합니다.
+여러 레포에 반복 적용할 고정 agent rules를 설치하는 plugin입니다.
+사용자에게 프로젝트 타입과 main push 정책만 확인한 뒤, 정해진 `AGENTS.md`,
+`docs/engineering/*`, Husky, commitlint guardrail 파일을 생성합니다. 레포의
+현재 구조, API, 환경 변수, README, 기존 문서를 분석해 맞춤 문서를 만들지
+않습니다.
 
-- [상세 설명](plugins/project-foundation/README.md)
+- [상세 설명](plugins/repo-agent-rules/README.md)
 
 ## 설치
 
