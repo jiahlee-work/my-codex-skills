@@ -1,0 +1,8 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+node scripts/guard-branch.mjs
+
+if [ -f "biome.json" ]; then
+  npx --no -- biome check --staged --write
+fi

@@ -1,0 +1,4 @@
+interface:
+  display_name: "React Test Setup"
+  short_description: "Install Vitest and React Testing Library conventions."
+  default_prompt: "Use $react-test-setup to add Vitest and React Testing Library to this repository."

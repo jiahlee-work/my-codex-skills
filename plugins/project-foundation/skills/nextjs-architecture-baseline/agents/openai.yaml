@@ -1,0 +1,4 @@
+interface:
+  display_name: "Next.js Architecture Baseline"
+  short_description: "Install Next.js App Router layered architecture docs."
+  default_prompt: "Use $nextjs-architecture-baseline to add Next.js layered architecture docs to this repository."

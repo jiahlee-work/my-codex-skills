@@ -1,0 +1,4 @@
+interface:
+  display_name: "Storybook Setup"
+  short_description: "Install and standardize Storybook for UI projects."
+  default_prompt: "Use $storybook-setup to add Storybook to this repository."

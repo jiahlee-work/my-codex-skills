@@ -1,0 +1,38 @@
+{
+  "name": "project-foundation",
+  "version": "0.1.0+codex.20260615115418",
+  "description": "Reusable repository foundation skills for code style, Next.js architecture, Git guardrails, tests, Storybook, and local verification.",
+  "author": {
+    "name": "my-codex-skills contributors"
+  },
+  "repository": "https://github.com/ndnv819/my-codex-skills",
+  "license": "MIT",
+  "keywords": [
+    "project-foundation",
+    "repository-setup",
+    "nextjs",
+    "layered-architecture",
+    "biome",
+    "commitlint",
+    "husky",
+    "vitest",
+    "storybook"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Project Foundation",
+    "shortDescription": "Install reusable repo baselines.",
+    "longDescription": "A collection of Codex skills for applying repeatable repository foundations: repo-local AGENTS and engineering docs, Next.js App Router layered architecture documentation, Biome and VS Code defaults, Husky and commitlint guardrails, branch guard scripts, GitHub Actions CI, Vitest with React Testing Library, Storybook setup, and local health checks.",
+    "developerName": "my-codex-skills contributors",
+    "category": "Productivity",
+    "capabilities": [
+      "Analyze",
+      "Write"
+    ],
+    "defaultPrompt": [
+      "Use project-foundation to audit this repository and plan the baseline setup.",
+      "Install code style, Next.js architecture, Git guardrails, Vitest, and Storybook baselines for this repository.",
+      "Check whether this repository has the standard project foundation."
+    ]
+  }
+}

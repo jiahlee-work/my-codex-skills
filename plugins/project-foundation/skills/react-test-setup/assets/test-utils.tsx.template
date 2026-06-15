@@ -1,0 +1,21 @@
+import { render } from "@testing-library/react";
+import type { ReactElement, ReactNode } from "react";
+
+type TestProvidersProps = {
+  children: ReactNode;
+};
+
+function TestProviders(props: TestProvidersProps) {
+  const { children } = props;
+
+  return <>{children}</>;
+}
+
+function renderWithProviders(ui: ReactElement) {
+  return render(ui, {
+    wrapper: TestProviders,
+  });
+}
+
+export * from "@testing-library/react";
+export { renderWithProviders as render };

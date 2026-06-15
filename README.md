@@ -33,6 +33,17 @@ Storybook·Playwright MCP 승인 단계, 실패 분석과 제한적 재시도를
 
 - [상세 설명](plugins/ticket-to-pr-workflow/README.md)
 
+### project-foundation
+
+여러 레포에 반복 적용할 기본 개발 환경과 운영 안전장치를 repo-local 파일로
+저장하도록 돕는 skill 모음입니다. `AGENTS.md`와 engineering docs, Next.js
+App Router layered architecture 문서, Biome와 VS Code 설정,
+Husky·commitlint·branch guard, GitHub Actions CI, branch protection 가이드,
+Vitest + React Testing Library, Storybook, local health check 기준을
+제공합니다.
+
+- [상세 설명](plugins/project-foundation/README.md)
+
 ## 설치
 
 이 레포의 local checkout을 marketplace source로 등록한 뒤 원하는 plugin을
