@@ -11,14 +11,14 @@ App Router와 관련된 독립적인 기능을 하위 skill로 추가할 수 있
 ### nextjs-layered-architecture
 
 제품 코드를 Presentation, Application, Infrastructure의 3개 핵심 Layer로
-분리합니다. `src/app`은 얇은 라우팅 경계로, `src/shared`는 중립적인 공통
+분리합니다. 루트 `app/`은 얇은 라우팅 경계로, `src/shared`는 중립적인 공통
 영역으로 유지합니다.
 
 ```text
 public/
   assets/
+app/              # Next.js boundary
 src/
-  app/              # Next.js boundary
   types/            # ambient declarations and type overrides
   presentation/     # core layer
   application/      # core layer
@@ -32,7 +32,7 @@ src/
 - `public/assets`, `src/types` 생성
 - root `@/*` TypeScript alias 설정
 - 코드의 변경 이유에 따른 파일 위치 판단
-- `src/app` 내부의 비라우팅 코드 탐지
+- `app/` 내부의 비라우팅 코드 탐지
 - 비표준 import 경고
 - 깊은 상대 경로와 legacy Layer alias를 `@/...` 형태로 자동 수정
 - ESLint import path rewrite 설정 감지 시 자동 수정 skip

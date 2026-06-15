@@ -1,33 +1,45 @@
 ---
 name: repo-guardrails
-description: Install or update repository guardrails for Git hooks, commitlint Conventional Commit validation with lowercase type and Korean summary, custom branch guard scripts, GitHub Actions CI, and GitHub branch protection. Use when Codex needs to protect main from direct commits or pushes, add Husky hooks, enforce commit messages, or document/apply branch protection.
+description: Install or update repository guardrails for repo-local AGENTS Git workflow instructions, Git hooks, commitlint Conventional Commit validation with lowercase type and Korean summary, optional branch guard scripts, GitHub Actions CI, and optional GitHub branch protection. Use when Codex needs to document or apply commit policy, branch policy, Husky hooks, CI, or branch protection.
 ---
 
 # Repo Guardrails
 
 ## Procedure
 
-1. Inspect the target repo for existing Husky hooks, commitlint config, branch
-   guard scripts, GitHub Actions workflows, package scripts, and GitHub remote.
-2. Propose file changes before applying them. Dependency and lockfile changes
+1. Inspect the target repo for existing `AGENTS.md`, Git workflow docs, Husky
+   hooks, commitlint config, branch guard scripts, GitHub Actions workflows,
+   package scripts, and GitHub remote.
+2. Merge `references/agents-git-workflow-snippet.md` into `AGENTS.md` and write
+   or merge `docs/engineering/git-workflow.md` from
+   `references/git-workflow.md` when the user approves repo-local guardrail
+   documentation.
+3. Propose file changes before applying them. Dependency and lockfile changes
    require explicit approval.
-3. Copy or adapt the assets:
+4. Before installing branch guard hooks, confirm the target repository's branch
+   guard profile from `AGENTS.md`, the user, or an existing project policy:
+   - `policy-only`: document the policy but do not install branch-blocking hooks
+   - `local-hooks`: block commits and pushes from the configured protected
+     branches
+   - `remote-protection`: document or apply GitHub branch protection after
+     separate explicit approval
+5. Copy or adapt the assets only for approved guardrail features:
    - `assets/commitlint.config.cjs` -> `commitlint.config.cjs`
    - `assets/guard-branch.mjs` -> `scripts/guard-branch.mjs`
    - `assets/husky-commit-msg` -> `.husky/commit-msg`
    - `assets/husky-pre-commit` -> `.husky/pre-commit`
    - `assets/husky-pre-push` -> `.husky/pre-push`
    - `assets/ci.yml` -> `.github/workflows/ci.yml`
-4. Add or merge package scripts:
+6. Add or merge package scripts:
    - `prepare`: `husky`
    - `guard:branch`: `node scripts/guard-branch.mjs`
-5. Add dev dependencies with approval:
+7. Add dev dependencies with approval:
    - `husky`
    - `@commitlint/cli`
    - `@commitlint/config-conventional`
    - `@biomejs/biome` when `code-style-baseline` is also applied
-6. Make hook files executable after writing them.
-7. Never mutate GitHub branch protection without explicit approval and a
+8. Make hook files executable after writing them.
+9. Never mutate GitHub branch protection without explicit approval and a
    reachable GitHub remote.
 
 ## Commit Policy
@@ -57,9 +69,14 @@ feat: add login error message
 
 ## Branch Guard
 
-The default branch guard blocks commits and pushes from `main`, `master`, and
-`develop`. The target repo may configure additional protected branches through
-the `PROTECTED_BRANCHES` environment variable.
+Direct commits or pushes to `main` are not mandatory for every repository. Treat
+branch blocking as an optional guardrail selected per target repo.
+
+When `local-hooks` is selected, the default protected branches are `main`,
+`master`, and `develop`. The target repo may configure additional protected
+branches through the `PROTECTED_BRANCHES` environment variable or by adapting the
+installed hook. When `policy-only` is selected, document the expected workflow in
+`AGENTS.md` and do not install branch-blocking hooks.
 
 ## GitHub Branch Protection
 
@@ -71,3 +88,5 @@ approval. Require status checks for the CI workflow when available.
 
 - `references/github-branch-protection.md`
 - `references/guardrails-checklist.md`
+- `references/git-workflow.md`
+- `references/agents-git-workflow-snippet.md`

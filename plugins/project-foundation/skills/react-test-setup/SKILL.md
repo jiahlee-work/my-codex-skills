@@ -1,6 +1,6 @@
 ---
 name: react-test-setup
-description: Install or update Vitest and React Testing Library setup for React, Next.js, and TypeScript repositories. Use when Codex needs to detect test stack gaps, add vitest.config.ts, test setup utilities, jsdom, @testing-library/react, @testing-library/jest-dom, and package scripts for unit or component tests.
+description: Install or update repo-local AGENTS testing instructions, testing policy docs, Vitest, and React Testing Library setup for React, Next.js, and TypeScript repositories. Use when Codex needs to detect test stack gaps, add docs/engineering/testing.md, add vitest.config.ts, test setup utilities, jsdom, @testing-library/react, @testing-library/jest-dom, and package scripts for unit or component tests.
 ---
 
 # React Test Setup
@@ -9,21 +9,24 @@ description: Install or update Vitest and React Testing Library setup for React,
 
 1. Inspect `package.json`, lockfile, existing test config, test files, and app
    framework.
-2. If another complete test stack exists, report it and ask before replacing or
+2. Merge `references/agents-testing-snippet.md` into `AGENTS.md` and write or
+   merge `docs/engineering/testing.md` from `references/testing-policy.md` when
+   the user approves repo-local testing documentation.
+3. If another complete test stack exists, report it and ask before replacing or
    layering Vitest on top.
-3. For React or Next.js TypeScript projects, propose Vitest + React Testing
+4. For React or Next.js TypeScript projects, propose Vitest + React Testing
    Library with jsdom.
-4. Require approval before installing dependencies or editing package, lock,
+5. Require approval before installing dependencies or editing package, lock,
    config, setup, or test utility files.
-5. Copy or adapt:
+6. Copy or adapt:
    - `assets/vitest.config.ts.template`
    - `assets/setup-tests.ts.template`
    - `assets/test-utils.tsx.template`
-6. Add package scripts when approved:
+7. Add package scripts when approved:
    - `test`: `vitest run`
    - `test:watch`: `vitest`
    - `test:coverage`: `vitest run --coverage`
-7. Add dev dependencies when approved:
+8. Add dev dependencies when approved:
    - `vitest`
    - `jsdom`
    - `@testing-library/react`
@@ -42,3 +45,4 @@ description: Install or update Vitest and React Testing Library setup for React,
 ## Resource
 
 - `references/testing-policy.md`
+- `references/agents-testing-snippet.md`

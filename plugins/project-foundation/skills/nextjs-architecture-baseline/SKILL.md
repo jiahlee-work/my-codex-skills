@@ -9,7 +9,7 @@ description: Install or update repo-local Next.js App Router layered architectur
 
 1. Inspect the target repository for Next.js App Router:
    - `next` dependency in `package.json`
-   - `src/app` or `app` route directory
+   - `app` route directory, or `src/app` when documenting a migration target
    - existing architecture docs or `AGENTS.md` architecture instructions
 2. Mark this baseline `not-applicable` for non-Next.js repositories or
    Pages Router-only projects unless the user explicitly wants the document as a

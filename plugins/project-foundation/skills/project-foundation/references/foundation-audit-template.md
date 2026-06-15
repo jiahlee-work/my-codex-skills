@@ -14,18 +14,20 @@
 
 | Area | Status | Notes |
 | --- | --- | --- |
-| AGENTS and engineering docs |  |  |
+| AGENTS common instructions |  |  |
+| Engineering docs |  |  |
 | Next.js layered architecture docs |  |  |
+| Git workflow docs |  |  |
 | Biome |  |  |
 | VS Code settings |  |  |
 | Husky |  |  |
 | commitlint |  |  |
-| branch guard |  |  |
+| optional branch guard |  |  |
 | GitHub Actions CI |  |  |
-| GitHub branch protection |  |  |
+| optional GitHub branch protection |  |  |
 | Vitest and React Testing Library |  |  |
 | Storybook |  |  |
-| Local health checks |  |  |
+| Verification instructions and local health checks |  |  |
 
 ## Proposed Changes
 

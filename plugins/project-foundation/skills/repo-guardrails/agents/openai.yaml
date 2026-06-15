@@ -1,4 +1,4 @@
 interface:
   display_name: "Repo Guardrails"
-  short_description: "Install Git hooks, commitlint, CI, and branch protections."
-  default_prompt: "Use $repo-guardrails to add Git and CI guardrails to this repository."
+  short_description: "Install repo-local Git workflow docs, commitlint, CI, and optional branch protections."
+  default_prompt: "Use $repo-guardrails to add repo-local Git workflow instructions and approved guardrails to this repository."

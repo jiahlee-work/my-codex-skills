@@ -27,8 +27,8 @@ const IGNORED_DIRECTORIES = new Set([
 ]);
 
 const REQUIRED_DIRECTORIES = [
+  "app",
   "public/assets",
-  "src/app",
   "src/types",
   "src/presentation/components",
   "src/presentation/features",
@@ -104,7 +104,7 @@ const ESLINT_IMPORT_REWRITE_PATTERNS = [
 ];
 
 const REQUIRED_LAYER_DIRECTORIES = [
-  "src/app",
+  "app",
   "src/presentation",
   "src/application",
   "src/infrastructure",
@@ -554,23 +554,23 @@ function setupProject(options) {
   const rootPages = path.join(projectRoot, "pages");
   const srcPages = path.join(projectRoot, "src", "pages");
 
-  if (fs.existsSync(rootApp)) {
+  if (fs.existsSync(srcApp)) {
     result.errors.push({
-      code: "root-app",
+      code: "src-app",
       message:
-        "A root app/ directory exists. Move it to src/app intentionally before running setup.",
-      file: "app",
+        "A src/app directory exists. Move it to root app/ intentionally before running setup.",
+      file: "src/app",
     });
   }
 
   if (
-    !fs.existsSync(srcApp) &&
+    !fs.existsSync(rootApp) &&
     (fs.existsSync(rootPages) || fs.existsSync(srcPages))
   ) {
     result.errors.push({
       code: "pages-router-only",
       message:
-        "A Pages Router directory exists without src/app. Confirm the App Router migration first.",
+        "A Pages Router directory exists without app/. Confirm the App Router migration first.",
       file: fs.existsSync(srcPages) ? "src/pages" : "pages",
     });
   }
@@ -735,7 +735,16 @@ function loadTypeScript(projectRoot) {
   );
 }
 
+function architectureScanRoots(projectRoot) {
+  return [path.join(projectRoot, "app"), path.join(projectRoot, "src")];
+}
+
 function layerOf(projectRoot, filePath) {
+  const appRelative = relativePath(path.join(projectRoot, "app"), filePath);
+  if (appRelative !== "." && !appRelative.startsWith("../")) {
+    return "app";
+  }
+
   const relative = relativePath(path.join(projectRoot, "src"), filePath);
   if (relative === "." || relative.startsWith("../")) return null;
   const [firstSegment] = relative.split("/");
@@ -974,45 +983,47 @@ function runBoundaryCheck(projectRoot) {
   const ts = loadTypeScript(root);
   const violations = [];
 
-  for (const file of walkFiles(path.join(root, "src"))) {
-    if (!isSourceFile(file)) continue;
-    const importerLayer = layerOf(root, file);
-    if (!importerLayer) continue;
+  for (const scanRoot of architectureScanRoots(root)) {
+    for (const file of walkFiles(scanRoot)) {
+      if (!isSourceFile(file)) continue;
+      const importerLayer = layerOf(root, file);
+      if (!importerLayer) continue;
 
-    const sourceText = fs.readFileSync(file, "utf8");
-    const extension = path.extname(file);
-    const scriptKind =
-      extension === ".tsx"
-        ? ts.ScriptKind.TSX
-        : extension === ".jsx"
-          ? ts.ScriptKind.JSX
-          : extension === ".js" || extension === ".mjs" || extension === ".cjs"
-            ? ts.ScriptKind.JS
-            : ts.ScriptKind.TS;
-    const sourceFile = ts.createSourceFile(
-      file,
-      sourceText,
-      ts.ScriptTarget.Latest,
-      true,
-      scriptKind,
-    );
+      const sourceText = fs.readFileSync(file, "utf8");
+      const extension = path.extname(file);
+      const scriptKind =
+        extension === ".tsx"
+          ? ts.ScriptKind.TSX
+          : extension === ".jsx"
+            ? ts.ScriptKind.JSX
+            : extension === ".js" || extension === ".mjs" || extension === ".cjs"
+              ? ts.ScriptKind.JS
+              : ts.ScriptKind.TS;
+      const sourceFile = ts.createSourceFile(
+        file,
+        sourceText,
+        ts.ScriptTarget.Latest,
+        true,
+        scriptKind,
+      );
 
-    for (const edge of collectImportEdges(ts, sourceFile)) {
-      const importedFile = resolveImport(root, file, edge.specifier);
-      if (!importedFile) continue;
-      const importedLayer = layerOf(root, importedFile);
-      if (!importedLayer) continue;
+      for (const edge of collectImportEdges(ts, sourceFile)) {
+        const importedFile = resolveImport(root, file, edge.specifier);
+        if (!importedFile) continue;
+        const importedLayer = layerOf(root, importedFile);
+        if (!importedLayer) continue;
 
-      if (!LAYER_RULES[importerLayer].has(importedLayer)) {
-        violations.push({
-          file: relativePath(root, file),
-          line: edge.line,
-          column: edge.column,
-          specifier: edge.specifier,
-          importerLayer,
-          importedLayer,
-          importedFile: relativePath(root, importedFile),
-        });
+        if (!LAYER_RULES[importerLayer].has(importedLayer)) {
+          violations.push({
+            file: relativePath(root, file),
+            line: edge.line,
+            column: edge.column,
+            specifier: edge.specifier,
+            importerLayer,
+            importedLayer,
+            importedFile: relativePath(root, importedFile),
+          });
+        }
       }
     }
   }
@@ -1025,39 +1036,41 @@ function runImportStyleCheck(projectRoot) {
   const ts = loadTypeScript(root);
   const violations = [];
 
-  for (const file of walkFiles(path.join(root, "src"))) {
-    if (!isSourceFile(file)) continue;
+  for (const scanRoot of architectureScanRoots(root)) {
+    for (const file of walkFiles(scanRoot)) {
+      if (!isSourceFile(file)) continue;
 
-    const sourceText = fs.readFileSync(file, "utf8");
-    const extension = path.extname(file);
-    const scriptKind =
-      extension === ".tsx"
-        ? ts.ScriptKind.TSX
-        : extension === ".jsx"
-          ? ts.ScriptKind.JSX
-          : extension === ".js" || extension === ".mjs" || extension === ".cjs"
-            ? ts.ScriptKind.JS
-            : ts.ScriptKind.TS;
-    const sourceFile = ts.createSourceFile(
-      file,
-      sourceText,
-      ts.ScriptTarget.Latest,
-      true,
-      scriptKind,
-    );
+      const sourceText = fs.readFileSync(file, "utf8");
+      const extension = path.extname(file);
+      const scriptKind =
+        extension === ".tsx"
+          ? ts.ScriptKind.TSX
+          : extension === ".jsx"
+            ? ts.ScriptKind.JSX
+            : extension === ".js" || extension === ".mjs" || extension === ".cjs"
+              ? ts.ScriptKind.JS
+              : ts.ScriptKind.TS;
+      const sourceFile = ts.createSourceFile(
+        file,
+        sourceText,
+        ts.ScriptTarget.Latest,
+        true,
+        scriptKind,
+      );
 
-    for (const edge of collectImportEdges(ts, sourceFile)) {
-      const replacement = resolveImportStyleReplacement(root, file, edge.specifier);
-      if (!replacement) continue;
+      for (const edge of collectImportEdges(ts, sourceFile)) {
+        const replacement = resolveImportStyleReplacement(root, file, edge.specifier);
+        if (!replacement) continue;
 
-      violations.push({
-        file: relativePath(root, file),
-        line: edge.line,
-        column: edge.column,
-        specifier: edge.specifier,
-        replacement: replacement.to,
-        code: replacement.code,
-      });
+        violations.push({
+          file: relativePath(root, file),
+          line: edge.line,
+          column: edge.column,
+          specifier: edge.specifier,
+          replacement: replacement.to,
+          code: replacement.code,
+        });
+      }
     }
   }
 
@@ -1100,71 +1113,73 @@ function fixImportsProject(options) {
     return result;
   }
 
-  for (const file of walkFiles(path.join(projectRoot, "src"))) {
-    if (!isSourceFile(file)) continue;
+  for (const scanRoot of architectureScanRoots(projectRoot)) {
+    for (const file of walkFiles(scanRoot)) {
+      if (!isSourceFile(file)) continue;
 
-    const sourceText = fs.readFileSync(file, "utf8");
-    const extension = path.extname(file);
-    const scriptKind =
-      extension === ".tsx"
-        ? ts.ScriptKind.TSX
-        : extension === ".jsx"
-          ? ts.ScriptKind.JSX
-          : extension === ".js" || extension === ".mjs" || extension === ".cjs"
-            ? ts.ScriptKind.JS
-            : ts.ScriptKind.TS;
-    const sourceFile = ts.createSourceFile(
-      file,
-      sourceText,
-      ts.ScriptTarget.Latest,
-      true,
-      scriptKind,
-    );
-
-    const replacements = [];
-    for (const edge of collectImportEdges(ts, sourceFile)) {
-      const replacement = resolveImportStyleReplacement(
-        projectRoot,
+      const sourceText = fs.readFileSync(file, "utf8");
+      const extension = path.extname(file);
+      const scriptKind =
+        extension === ".tsx"
+          ? ts.ScriptKind.TSX
+          : extension === ".jsx"
+            ? ts.ScriptKind.JSX
+            : extension === ".js" || extension === ".mjs" || extension === ".cjs"
+              ? ts.ScriptKind.JS
+              : ts.ScriptKind.TS;
+      const sourceFile = ts.createSourceFile(
         file,
-        edge.specifier,
+        sourceText,
+        ts.ScriptTarget.Latest,
+        true,
+        scriptKind,
       );
-      if (!replacement || replacement.to === edge.specifier) continue;
 
-      replacements.push({
-        start: edge.start + 1,
-        end: edge.end - 1,
-        from: edge.specifier,
-        to: replacement.to,
-        code: replacement.code,
-        line: edge.line,
-        column: edge.column,
-      });
-    }
+      const replacements = [];
+      for (const edge of collectImportEdges(ts, sourceFile)) {
+        const replacement = resolveImportStyleReplacement(
+          projectRoot,
+          file,
+          edge.specifier,
+        );
+        if (!replacement || replacement.to === edge.specifier) continue;
 
-    if (replacements.length === 0) continue;
-
-    const relativeFile = relativePath(projectRoot, file);
-    result.changed.push(relativeFile);
-    for (const replacement of replacements) {
-      result.fixes.push({
-        file: relativeFile,
-        line: replacement.line,
-        column: replacement.column,
-        from: replacement.from,
-        to: replacement.to,
-        code: replacement.code,
-      });
-    }
-
-    if (!options.dryRun) {
-      let updatedText = sourceText;
-      for (const replacement of replacements.sort((a, b) => b.start - a.start)) {
-        updatedText =
-          updatedText.slice(0, replacement.start) +
-          replacement.to +
-          updatedText.slice(replacement.end);
+        replacements.push({
+          start: edge.start + 1,
+          end: edge.end - 1,
+          from: edge.specifier,
+          to: replacement.to,
+          code: replacement.code,
+          line: edge.line,
+          column: edge.column,
+        });
       }
-      fs.writeFileSync(file, updatedText);
+
+      if (replacements.length === 0) continue;
+
+      const relativeFile = relativePath(projectRoot, file);
+      result.changed.push(relativeFile);
+      for (const replacement of replacements) {
+        result.fixes.push({
+          file: relativeFile,
+          line: replacement.line,
+          column: replacement.column,
+          from: replacement.from,
+          to: replacement.to,
+          code: replacement.code,
+        });
+      }
+
+      if (!options.dryRun) {
+        let updatedText = sourceText;
+        for (const replacement of replacements.sort((a, b) => b.start - a.start)) {
+          updatedText =
+            updatedText.slice(0, replacement.start) +
+            replacement.to +
+            updatedText.slice(replacement.end);
+        }
+        fs.writeFileSync(file, updatedText);
+      }
     }
   }
 
@@ -1180,12 +1195,12 @@ function auditProject(options) {
     findings.push({ severity: "error", ...error });
   }
 
-  if (fs.existsSync(path.join(projectRoot, "app"))) {
+  if (fs.existsSync(path.join(projectRoot, "src", "app"))) {
     findings.push({
       severity: "error",
-      code: "root-app",
-      message: "Use src/app instead of a root app/ directory",
-      file: "app",
+      code: "src-app",
+      message: "Use root app/ instead of src/app",
+      file: "src/app",
     });
   }
 
@@ -1224,14 +1239,14 @@ function auditProject(options) {
     });
   }
 
-  const appRoot = path.join(projectRoot, "src", "app");
+  const appRoot = path.join(projectRoot, "app");
   for (const file of walkFiles(appRoot)) {
     if (!isAllowedAppFile(file)) {
       findings.push({
         severity: "error",
         code: "app-owned-code",
         message:
-          "src/app may contain only routing boundary files, metadata files, assets, and providers.tsx",
+          "app/ may contain only routing boundary files, metadata files, assets, and providers.tsx",
         file: relativePath(projectRoot, file),
       });
       continue;

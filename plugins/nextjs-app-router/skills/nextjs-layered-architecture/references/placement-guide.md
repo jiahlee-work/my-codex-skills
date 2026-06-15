@@ -14,9 +14,9 @@ Ask these questions in order:
 
 1. Is it a Next.js route, layout, loading/error boundary, route handler, or
    metadata file?
-   - Place it in `src/app`.
+   - Place it in root `app/`.
    - Keep framework root boundaries such as `proxy.ts` and
-     `instrumentation.ts` at `src/` as Next.js requires.
+     `instrumentation.ts` at the root or `src/` location Next.js requires.
 2. Is it visible UI or interaction composition?
    - Place it in `src/presentation`.
 3. Does it decide when or why an action occurs, manage state, or implement a
@@ -71,7 +71,7 @@ converting external responses into internal shapes.
 ## Subscription History Example
 
 ```text
-src/app/my/subscription/history/page.tsx
+app/my/subscription/history/page.tsx
   -> src/presentation/features/my/subscription/history/index.tsx
   -> src/application/hooks/api/payment/use-subscription-history.ts
   -> src/infrastructure/apis/payment/index.ts
@@ -169,19 +169,19 @@ Before moving files:
 Do not infer ownership from the current directory name. Read imports, exports,
 runtime directives, and callers.
 
-When moving from root `app/` to `src/app`:
+When moving from `src/app` to root `app/`:
 
 - preserve route groups such as `(marketing)`
 - preserve dynamic and catch-all segments
 - preserve parallel route slots such as `@modal`
 - preserve intercepting route notation
 - verify metadata and static route assets
-- repair relative imports that assumed the repository root
+- repair relative imports that assumed the `src` directory
 - verify middleware and instrumentation locations separately
 
 ## Review Checklist
 
-- Is `src/app` limited to routing and composition?
+- Is root `app/` limited to routing and composition?
 - Does each feature screen live under `presentation/features`?
 - Are server-state and application-state concerns in `application`?
 - Are concrete external calls and DTOs in `infrastructure`?

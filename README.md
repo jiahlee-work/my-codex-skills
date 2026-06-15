@@ -9,7 +9,7 @@
 ### nextjs-app-router
 
 Next.js App Router 프로젝트의 설계, 구현, 검증을 지원하는 skill 모음입니다.
-현재 포함된 `nextjs-layered-architecture` skill은 `src/app`을 얇게 유지하고,
+현재 포함된 `nextjs-layered-architecture` skill은 루트 `app/`을 얇게 유지하고,
 제품 코드를 `presentation`, `application`, `infrastructure`의 3개 핵심
 Layer로 분리합니다. `shared`는 중립적인 지원 영역으로 두고 TypeScript AST로
 역방향 의존을 검사합니다.
@@ -38,8 +38,9 @@ Storybook·Playwright MCP 승인 단계, 실패 분석과 제한적 재시도를
 여러 레포에 반복 적용할 기본 개발 환경과 운영 안전장치를 repo-local 파일로
 저장하도록 돕는 skill 모음입니다. `AGENTS.md`와 engineering docs, Next.js
 App Router layered architecture 문서, Biome와 VS Code 설정,
-Husky·commitlint·branch guard, GitHub Actions CI, branch protection 가이드,
-Vitest + React Testing Library, Storybook, local health check 기준을
+Husky·commitlint·선택형 branch guard, GitHub Actions CI, 선택형 branch
+protection 가이드, Vitest + React Testing Library, Storybook, local health
+check 기준을
 제공합니다.
 
 - [상세 설명](plugins/project-foundation/README.md)

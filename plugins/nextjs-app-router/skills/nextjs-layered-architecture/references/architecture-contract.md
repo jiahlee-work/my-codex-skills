@@ -14,8 +14,8 @@
 ```text
 public/
   assets/
+app/
 src/
-  app/
   types/
   presentation/
     components/
@@ -62,7 +62,7 @@ User
 
 ### app
 
-`src/app` owns only Next.js routing boundaries and composition.
+Root `app/` owns only Next.js routing boundaries and composition.
 
 Allowed:
 
@@ -74,8 +74,9 @@ Allowed:
 - route metadata and segment configuration
 - a small `providers.tsx` composition boundary
 
-Keep framework-level files such as `src/proxy.ts`,
-`src/instrumentation.ts`, and `src/instrumentation-client.ts` at the location
+Keep framework-level files such as `src/proxy.ts`, root `proxy.ts`,
+`src/instrumentation.ts`, root `instrumentation.ts`,
+`src/instrumentation-client.ts`, and root `instrumentation-client.ts` at the location
 required by Next.js. They are framework entry boundaries outside the product
 layers, not candidates for `shared`.
 
@@ -255,7 +256,7 @@ export default function Page() {
 ```
 
 Use route groups, dynamic segments, parallel routes, and intercepting routes
-inside `src/app` as Next.js requires. Their route files remain thin even when
+inside root `app/` as Next.js requires. Their route files remain thin even when
 the directory topology is complex.
 
 Keep route handlers thin as well:

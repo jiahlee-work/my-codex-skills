@@ -16,7 +16,7 @@ afterEach(() => {
   }
 });
 
-function createProject(options: { rootApp?: boolean } = {}) {
+function createProject(options: { srcApp?: boolean } = {}) {
   const project = fs.mkdtempSync(
     path.join(os.tmpdir(), "nextjs-layered-architecture-")
   );
@@ -44,9 +44,9 @@ function createProject(options: { rootApp?: boolean } = {}) {
     `${JSON.stringify({ compilerOptions: { strict: true } }, null, 2)}\n`
   );
 
-  const appRoot = options.rootApp
-    ? path.join(project, "app")
-    : path.join(project, "src", "app");
+  const appRoot = options.srcApp
+    ? path.join(project, "src", "app")
+    : path.join(project, "app");
   fs.mkdirSync(appRoot, { recursive: true });
   fs.writeFileSync(
     path.join(appRoot, "page.tsx"),
@@ -79,6 +79,7 @@ describe("nextjs-layered-architecture", () => {
 
     expect(result.status).toBe(0);
     expect(result.stderr).toBe("");
+    expect(fs.existsSync(path.join(project, "app"))).toBe(true);
     expect(fs.existsSync(path.join(project, "public", "assets"))).toBe(true);
     expect(fs.existsSync(path.join(project, "src", "types"))).toBe(true);
     expect(fs.existsSync(path.join(project, "src", "presentation", "features"))).toBe(
@@ -116,8 +117,8 @@ describe("nextjs-layered-architecture", () => {
     expect(JSON.parse(audit.stdout).errorCount).toBe(0);
   });
 
-  it("rejects setup when a root app directory needs an intentional migration", () => {
-    const project = createProject({ rootApp: true });
+  it("rejects setup when a src app directory needs an intentional migration", () => {
+    const project = createProject({ srcApp: true });
 
     const result = run("setup", project, "--json");
     const output = JSON.parse(result.stdout);
@@ -126,18 +127,18 @@ describe("nextjs-layered-architecture", () => {
     expect(output.errors).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          code: "root-app",
+          code: "src-app",
         }),
       ])
     );
     expect(fs.existsSync(path.join(project, "src", "presentation"))).toBe(false);
   });
 
-  it("reports non-routing source files owned by src/app", () => {
+  it("reports non-routing source files owned by app", () => {
     const project = createProject();
     expect(run("setup", project).status).toBe(0);
     fs.writeFileSync(
-      path.join(project, "src", "app", "dashboard-card.tsx"),
+      path.join(project, "app", "dashboard-card.tsx"),
       "export function DashboardCard() { return <div />; }\n"
     );
 
@@ -149,7 +150,7 @@ describe("nextjs-layered-architecture", () => {
       expect.arrayContaining([
         expect.objectContaining({
           code: "app-owned-code",
-          file: "src/app/dashboard-card.tsx",
+          file: "app/dashboard-card.tsx",
         }),
       ])
     );

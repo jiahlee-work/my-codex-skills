@@ -15,8 +15,8 @@ For what reason will this code change?
 ```text
 public/
   assets/
+app/
 src/
-  app/
   presentation/
     components/
     features/
@@ -62,9 +62,10 @@ User
   -> API, database, browser API, SDK, or external service
 ```
 
-## `src/app`
+## `app/`
 
-`src/app` owns Next.js routing, route segment files, and framework composition.
+Root `app/` owns Next.js routing, route segment files, and framework
+composition.
 
 Allowed:
 
@@ -86,11 +87,12 @@ export default function Page() {
 ```
 
 Do not put complex UI, reusable product logic, state stores, server-state hooks,
-API clients, SDK initialization, or shared utilities in `src/app`.
+API clients, SDK initialization, or shared utilities in `app/`.
 
-Framework-required root files such as `src/proxy.ts`, `src/instrumentation.ts`,
-and `src/instrumentation-client.ts` stay where Next.js requires them. Treat them
-as framework boundaries, not as `shared` utilities.
+Framework-required root files such as `proxy.ts`, `src/proxy.ts`,
+`instrumentation.ts`, `src/instrumentation.ts`, `instrumentation-client.ts`, and
+`src/instrumentation-client.ts` stay where Next.js requires them. Treat them as
+framework boundaries, not as `shared` utilities.
 
 ## `src/presentation`
 
@@ -258,7 +260,7 @@ Avoid imports that climb two or more parent directories.
 Ask these questions in order:
 
 1. Is it a Next.js route, layout, loading/error boundary, route handler, or
-   metadata file? Put it in `src/app`.
+   metadata file? Put it in root `app/`.
 2. Is it visible UI or interaction composition? Put it in `src/presentation`.
 3. Does it decide when or why an action occurs, manage state, or implement a
    user flow? Put it in `src/application`.
@@ -290,7 +292,7 @@ route-paths.ts
 
 ## Review Checklist
 
-- Is `src/app` limited to routing and composition?
+- Is root `app/` limited to routing and composition?
 - Does each feature screen live under `presentation/features`?
 - Are user flows, cache policy, and state orchestration in `application`?
 - Are concrete external calls, DTOs, and SDK clients in `infrastructure`?

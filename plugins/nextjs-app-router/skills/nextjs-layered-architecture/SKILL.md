@@ -1,6 +1,6 @@
 ---
 name: nextjs-layered-architecture
-description: "Scaffold, organize, extend, migrate, and audit Next.js App Router projects around three core product layers: presentation, application, and infrastructure, with src/app as a thin framework boundary and src/shared as a neutral supporting area. Use when Codex needs to create or repair an App Router structure, decide where new code belongs, add a route or feature, configure the root @/* TypeScript path alias, rewrite non-canonical imports to @/... imports, move product code out of app, or check layer boundaries and naming rules."
+description: "Scaffold, organize, extend, migrate, and audit Next.js App Router projects around a root app routing boundary plus three src product layers: presentation, application, and infrastructure, with src/shared as a neutral supporting area. Use when Codex needs to create or repair an App Router structure, decide where new code belongs, add a route or feature, configure the root @/* TypeScript path alias, rewrite non-canonical imports to @/... imports, move product code out of app, or check layer boundaries and naming rules."
 ---
 
 # Next.js Layered Architecture
@@ -24,8 +24,8 @@ Treat the remaining source areas as supporting boundaries:
 ```text
 public/
   assets/
+app/
 src/
-  app/
   types/
   presentation/
   application/
@@ -98,13 +98,13 @@ Apply the setup:
 The setup command:
 
 - verifies that `next` is declared
-- rejects an unreviewed root `app/` or Pages Router-only layout
+- rejects an unreviewed `src/app` or Pages Router-only layout
 - creates the standard layer directories
 - creates `public/assets` and `src/types`
 - configures the root `@/*` alias
 - preserves existing source files and dependencies
 
-Do not automatically move a root `app/` directory. Route groups, parallel
+Do not automatically move a `src/app` directory. Route groups, parallel
 routes, intercepting routes, metadata, relative imports, and Server/Client
 Component boundaries require code-aware migration.
 
@@ -117,7 +117,7 @@ rewriting JSONC as JSON.
 Classify new code in this order:
 
 1. Next.js route, layout, route handler, metadata, or framework boundary:
-   `src/app`
+   `app`
 2. Visible UI or interaction composition: `src/presentation`
 3. User flow, use case, server-state handling, application state, or policy:
    `src/application`
@@ -197,7 +197,7 @@ Run only the import boundary check:
 
 Add `--json` for machine-readable output.
 
-The audit checks structure, the root `@/*` alias, thin `src/app` boundaries,
+The audit checks structure, the root `@/*` alias, thin `app/` boundaries,
 JSX placement, kebab-case names, non-canonical imports, and forbidden imports.
 Run `fix-imports` before `audit` when the task should auto-correct import
 style. AST-based checks require an available `typescript` package. Do not add a

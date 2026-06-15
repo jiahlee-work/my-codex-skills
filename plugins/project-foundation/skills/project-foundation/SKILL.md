@@ -1,6 +1,6 @@
 ---
 name: project-foundation
-description: Audit a repository and plan or apply repeatable project foundation setup. Use when Codex needs to install, update, or check repo-local AGENTS instructions, engineering docs, Next.js layered architecture docs, Biome and VS Code settings, Husky and commitlint guardrails, branch guard scripts, GitHub Actions CI, Vitest with React Testing Library, Storybook, or local verification commands across multiple repositories.
+description: Audit a repository and plan or apply repeatable project foundation setup. Use when Codex needs to install, update, or check repo-local AGENTS instructions, engineering docs, Next.js layered architecture docs, Biome and VS Code settings, Husky and commitlint guardrails, optional branch guard scripts, GitHub Actions CI, Vitest with React Testing Library, Storybook, or local verification commands across multiple repositories.
 ---
 
 # Project Foundation
@@ -9,8 +9,8 @@ description: Audit a repository and plan or apply repeatable project foundation 
 
 Use this parent skill to make repository foundations explicit and repo-local.
 The plugin provides reusable defaults, but the target repository should own the
-resulting files: `AGENTS.md`, engineering docs, tool configs, hooks, workflows,
-and test or Storybook setup.
+resulting rules and files: `AGENTS.md`, engineering docs, tool configs, hooks,
+workflows, and test or Storybook setup.
 
 ## Workflow
 
@@ -31,7 +31,8 @@ and test or Storybook setup.
 4. Apply only approved baseline areas and preserve target repo conventions that
    are more specific than this plugin.
 5. Store durable rules in the target repo. Do not require this plugin to be
-   present for future contributors or CI to understand the rules.
+   present for future contributors, CI, or other coding agents to understand
+   the rules.
 6. Run `project-health-check` after setup unless the user asks for audit-only.
 
 ## Baseline Areas
@@ -40,14 +41,22 @@ and test or Storybook setup.
   `biome.json`, and `.vscode/settings.json`.
 - Use `nextjs-architecture-baseline` for Next.js App Router architecture docs
   and `AGENTS.md` architecture instructions.
-- Use `repo-guardrails` for Husky, commitlint, custom branch guard scripts,
-  GitHub Actions CI, and GitHub branch protection guidance.
-- Use `react-test-setup` for Vitest and React Testing Library.
-- Use `storybook-setup` for Storybook setup and story conventions.
+- Use `repo-guardrails` for `AGENTS.md` Git workflow instructions,
+  `docs/engineering/git-workflow.md`, Husky, commitlint, optional branch guard
+  scripts, GitHub Actions CI, and optional GitHub branch protection guidance.
+- Use `react-test-setup` for `AGENTS.md` testing instructions,
+  `docs/engineering/testing.md`, and Vitest with React Testing Library.
+- Use `storybook-setup` for `AGENTS.md` Storybook instructions,
+  `docs/engineering/storybook.md`, setup, and story conventions.
 - Use `project-health-check` to resolve and run lint, typecheck, test, and build
-  commands.
+  commands, and to provide the `AGENTS.md` verification instructions used by the
+  foundation baseline.
 - For architecture audits, migrations, or import-boundary checks, prefer the
   separate `nextjs-layered-architecture` skill when available.
+
+Keep long-lived, always-on agent behavior in target-repository `AGENTS.md`
+snippets and engineering docs. Keep executable helpers, setup automation,
+validation scripts, and multi-step workflows in this plugin.
 
 ## Approval Rules
 

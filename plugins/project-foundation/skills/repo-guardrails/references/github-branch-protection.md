@@ -2,7 +2,9 @@
 
 Use this policy only after the user approves remote GitHub settings changes.
 
-Recommended `main` protection:
+Use remote branch protection only when the repository selects the
+`remote-protection` guardrail profile. Recommended protection for the selected
+default branch, commonly `main`:
 
 - Require a pull request before merging.
 - Require at least one approval.
@@ -17,6 +19,6 @@ Recommended `main` protection:
 - Include administrators when the repository should not allow emergency direct
   pushes.
 
-Do not bypass local hooks by relying only on branch protection. Local branch
-guards catch mistakes earlier; GitHub branch protection is the final server-side
-backstop.
+Do not rely only on branch protection when the repository selected
+`local-hooks`. Local branch guards catch mistakes earlier; GitHub branch
+protection is the final server-side backstop.
