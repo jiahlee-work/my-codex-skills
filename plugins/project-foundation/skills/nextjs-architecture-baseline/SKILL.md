@@ -18,10 +18,13 @@ description: Install or update repo-local Next.js App Router layered architectur
    - Write `docs/engineering/nextjs-layered-architecture.md` from
      `references/nextjs-layered-architecture.md`.
    - Merge `references/agents-nextjs-architecture-snippet.md` into `AGENTS.md`.
-4. Do not move files, create directories, rewrite imports, or refactor
+4. Do not generate descriptive `AGENTS.md` sections from the current route
+   layout, file layout, UI implementation, API routes, environment usage, or
+   package scripts. Existing structure may be legacy or in transition.
+5. Do not move files, create directories, rewrite imports, or refactor
    architecture during this baseline installation unless the user separately
    approves implementation work.
-5. When architecture audit or migration is requested, prefer the separate
+6. When architecture audit or migration is requested, prefer the separate
    `nextjs-layered-architecture` skill if it is available. This skill only
    installs the repo-local documentation baseline.
 

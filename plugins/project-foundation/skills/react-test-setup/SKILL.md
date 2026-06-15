@@ -12,6 +12,8 @@ description: Install or update repo-local AGENTS testing instructions, testing p
 2. Merge `references/agents-testing-snippet.md` into `AGENTS.md` and write or
    merge `docs/engineering/testing.md` from `references/testing-policy.md` when
    the user approves repo-local testing documentation.
+   Do not add descriptive current test command, framework, or file-structure
+   summaries to `AGENTS.md`.
 3. If another complete test stack exists, report it and ask before replacing or
    layering Vitest on top.
 4. For React or Next.js TypeScript projects, propose Vitest + React Testing

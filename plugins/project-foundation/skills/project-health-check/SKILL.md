@@ -34,6 +34,9 @@ GitHub Actions, auth, routing, build, or framework changes.
 When `project-foundation` installs repo-local instructions, use
 `references/agents-verification-snippet.md` for the target repo `AGENTS.md` and
 `references/verification-policy.md` for `docs/engineering/verification.md`.
+Do not list package-manager-specific commands in `AGENTS.md` from repository
+inspection. Keep command discovery in verification reports or engineering docs
+only when explicitly approved.
 Standalone health-check runs remain read-only.
 
 ## Resource

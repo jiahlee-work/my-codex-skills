@@ -12,6 +12,8 @@ description: Install or update repo-local AGENTS Storybook instructions, Storybo
 2. Merge `references/agents-storybook-snippet.md` into `AGENTS.md` and write or
    merge `docs/engineering/storybook.md` from `references/storybook-policy.md`
    when the user approves repo-local Storybook documentation.
+   Do not add descriptive current UI, component-library, visual design, route,
+   or Storybook inventory sections to `AGENTS.md`.
 3. Prefer the official Storybook initializer for missing setup:
    - `pnpm dlx storybook@latest init`
    - `npm create storybook@latest`

@@ -20,6 +20,9 @@ workflows, and test or Storybook setup.
    - existing `AGENTS.md`, docs, formatter, linter, test, Storybook, hook, CI,
      and GitHub remote configuration
    - current branch and dirty working tree
+   Use inspection only to classify baseline applicability, detect conflicts, and
+   choose approved setup steps. Do not turn observed repository state into
+   descriptive `AGENTS.md` content.
 2. Produce an audit with four states for each baseline area:
    - `present`: compatible setup exists
    - `missing`: setup is absent
@@ -29,7 +32,9 @@ workflows, and test or Storybook setup.
    lockfiles, creating hooks, running setup commands, or mutating GitHub branch
    protection.
 4. Apply only approved baseline areas and preserve target repo conventions that
-   are more specific than this plugin.
+   are more specific than this plugin when they are written as prescriptive
+   rules. Do not preserve or generate descriptive summaries of current structure
+   as durable agent instructions.
 5. Store durable rules in the target repo. Do not require this plugin to be
    present for future contributors, CI, or other coding agents to understand
    the rules.
@@ -37,6 +42,8 @@ workflows, and test or Storybook setup.
 
 ## Baseline Areas
 
+- Merge `references/agents-foundation-snippet.md` into `AGENTS.md` before other
+  baseline snippets when creating or refreshing repository instructions.
 - Use `code-style-baseline` for `AGENTS.md`, engineering style docs,
   `biome.json`, and `.vscode/settings.json`.
 - Use `nextjs-architecture-baseline` for Next.js App Router architecture docs
@@ -58,6 +65,9 @@ Keep long-lived, always-on agent behavior in target-repository `AGENTS.md`
 snippets and engineering docs. Keep executable helpers, setup automation,
 validation scripts, and multi-step workflows in this plugin.
 
+Follow `references/agents-composition-policy.md` whenever creating or updating
+target-repository `AGENTS.md`.
+
 ## Approval Rules
 
 - Safe without approval: read files, inspect package scripts, check config
@@ -71,3 +81,5 @@ validation scripts, and multi-step workflows in this plugin.
 ## Resource
 
 - Audit template: `references/foundation-audit-template.md`
+- AGENTS composition policy: `references/agents-composition-policy.md`
+- Foundation AGENTS snippet: `references/agents-foundation-snippet.md`

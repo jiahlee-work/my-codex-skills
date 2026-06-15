@@ -16,5 +16,8 @@ The plugin provides defaults for repo-local foundations:
 
 The target repository remains the source of truth after setup. Durable rules
 should live in that repository's `AGENTS.md` and `docs/engineering/*` so any
-coding agent can follow them without requiring this plugin. Generated docs,
+coding agent can follow them without requiring this plugin. `AGENTS.md` content
+is prescriptive: the plugin must not generate project overviews, command
+inventories, repository-structure summaries, environment summaries, UI
+summaries, or API summaries from the current repository state. Generated docs,
 configs, hooks, and workflows should be committed to that repository.

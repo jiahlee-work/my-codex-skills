@@ -14,6 +14,8 @@ description: Install or update repository guardrails for repo-local AGENTS Git w
    or merge `docs/engineering/git-workflow.md` from
    `references/git-workflow.md` when the user approves repo-local guardrail
    documentation.
+   Do not add descriptive current remote, branch, CI workflow, package-script,
+   or repository-structure summaries to `AGENTS.md`.
 3. Propose file changes before applying them. Dependency and lockfile changes
    require explicit approval.
 4. Before installing branch guard hooks, confirm the target repository's branch

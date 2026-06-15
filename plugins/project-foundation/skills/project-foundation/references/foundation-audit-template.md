@@ -14,6 +14,7 @@
 
 | Area | Status | Notes |
 | --- | --- | --- |
+| AGENTS composition policy |  |  |
 | AGENTS common instructions |  |  |
 | Engineering docs |  |  |
 | Next.js layered architecture docs |  |  |

@@ -20,6 +20,9 @@ description: Install or update repo-local React, Next.js, TypeScript, Biome, and
    - Write or merge `biome.json` from `assets/biome.json`.
    - Write or merge `.vscode/settings.json` from `assets/vscode-settings.json`.
 4. Preserve stricter project-specific rules and explicit user instructions.
+   Do not add repo-derived descriptive sections such as project overview,
+   current command lists, repository structure, environment, UI implementation,
+   or API behavior to `AGENTS.md`.
 5. Do not broad-reformat existing files as part of setup. Formatting existing
    code is a separate approved change.
 6. Add package scripts only with approval:
