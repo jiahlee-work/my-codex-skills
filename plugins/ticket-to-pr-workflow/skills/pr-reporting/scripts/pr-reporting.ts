@@ -5,6 +5,8 @@ import { promisify } from "node:util";
 import { fileURLToPath } from "node:url";
 import {
   allowedCommitTypes,
+  hasKoreanText,
+  normalizeCommitSummary,
   validateCommitMessage,
   type CommitType
 } from "../../branch-commit-policy/scripts/branch-commit-policy.js";
@@ -41,7 +43,9 @@ export type CommitPlanValidation = {
   commitConventionStatus: "pass" | "fail";
   ticketReferenceStatus: "pass" | "fail";
   allowedTypeStatus: "pass" | "fail";
+  lowercaseTypeStatus: "pass" | "fail";
   scopeOmittedStatus: "pass" | "fail";
+  koreanSummaryStatus: "pass" | "fail";
   errors: string[];
 };
 
@@ -161,13 +165,7 @@ function firstMeaningfulLine(value?: string): string | undefined {
 }
 
 function normalizeSummary(value: string): string {
-  const cleaned = value
-    .replace(/`/g, "")
-    .replace(/[.!]+$/, "")
-    .replace(/\s+/g, " ")
-    .trim();
-  const summary = cleaned || "implement approved ticket changes";
-  return summary.length > 64 ? summary.slice(0, 64).trimEnd() : summary;
+  return normalizeCommitSummary(value);
 }
 
 function cleanTopic(value: string): string {
@@ -291,7 +289,7 @@ export function buildCommitPlan(options: {
       commits,
       groups.tests,
       "test",
-      `add tests for ${topic}`,
+      `${topic} 테스트 추가`,
       options.context.ticketKey
     );
     pushCommit(
@@ -305,7 +303,7 @@ export function buildCommitPlan(options: {
       commits,
       [...groups.support, ...groups.docs],
       groups.support.length > 0 ? "chore" : "docs",
-      `update supporting files for ${topic}`,
+      `${topic} 지원 파일 업데이트`,
       options.context.ticketKey
     );
   } else {
@@ -313,7 +311,7 @@ export function buildCommitPlan(options: {
       commits,
       groups.tests,
       "test",
-      `add tests for ${topic}`,
+      `${topic} 테스트 추가`,
       options.context.ticketKey
     );
     pushCommit(
@@ -327,14 +325,14 @@ export function buildCommitPlan(options: {
       commits,
       groups.docs,
       "docs",
-      `document ${topic}`,
+      `${topic} 문서화`,
       options.context.ticketKey
     );
     pushCommit(
       commits,
       groups.support,
       "chore",
-      `update tooling for ${topic}`,
+      `${topic} 도구 설정 업데이트`,
       options.context.ticketKey
     );
   }
@@ -391,14 +389,28 @@ export function validateCommitPlan(
   )
     ? "pass"
     : "fail";
-  const allowedTypeStatus = subjects.every((subject) =>
-    allowedCommitTypes.some((type) => subject.startsWith(`${type}: `))
+  const subjectTypes = subjects.map(
+    (subject) => /^([A-Za-z]+)(?:\([^)]+\))?:\s+/.exec(subject)?.[1]
+  );
+  const allowedTypeStatus = subjectTypes.every((type) =>
+    Boolean(type && allowedCommitTypes.includes(type as CommitType))
+  )
+    ? "pass"
+    : "fail";
+  const lowercaseTypeStatus = subjectTypes.every((type) =>
+    Boolean(type && type === type.toLowerCase())
   )
     ? "pass"
     : "fail";
   const scopeOmittedStatus = subjects.every(
-    (subject) => !/^[a-z]+\([^)]+\):/.test(subject)
+    (subject) => !/^[A-Za-z]+\([^)]+\):/.test(subject)
   )
+    ? "pass"
+    : "fail";
+  const koreanSummaryStatus = subjects.every((subject) => {
+    const summary = /^(?:feat|fix|test|refactor|chore|docs):\s+(.+)$/.exec(subject)?.[1];
+    return Boolean(summary && hasKoreanText(summary));
+  })
     ? "pass"
     : "fail";
 
@@ -407,7 +419,9 @@ export function validateCommitPlan(
     commitConventionStatus,
     ticketReferenceStatus,
     allowedTypeStatus,
+    lowercaseTypeStatus,
     scopeOmittedStatus,
+    koreanSummaryStatus,
     errors
   };
 }
@@ -465,7 +479,9 @@ export async function writeCommitPlan(
     commitConventionStatus: validation.commitConventionStatus,
     ticketReferenceStatus: validation.ticketReferenceStatus,
     allowedTypeStatus: validation.allowedTypeStatus,
+    lowercaseTypeStatus: validation.lowercaseTypeStatus,
     scopeOmittedStatus: validation.scopeOmittedStatus,
+    koreanSummaryStatus: validation.koreanSummaryStatus,
     dryRunStatus: plan.dryRun
       ? "Dry-run only. No commit, push, or PR was created."
       : "Execution was explicitly requested and still requires final prerequisite checks."

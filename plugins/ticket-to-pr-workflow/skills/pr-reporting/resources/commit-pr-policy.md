@@ -11,6 +11,8 @@
 - Commit convention: {{commitConventionStatus}}
 - Ticket reference: {{ticketReferenceStatus}}
 - Allowed type: {{allowedTypeStatus}}
+- Lowercase type: {{lowercaseTypeStatus}}
 - Scope omitted: {{scopeOmittedStatus}}
+- Korean summary: {{koreanSummaryStatus}}
 ## Dry Run
 {{dryRunStatus}}

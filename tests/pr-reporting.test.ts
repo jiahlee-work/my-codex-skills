@@ -126,7 +126,7 @@ feature/FE-123-login-error-message
 ## Proposed Commit
 
 \`\`\`text
-feat: show login failure message
+feat: 로그인 실패 메시지 표시
 Refs: FE-123
 \`\`\`
 

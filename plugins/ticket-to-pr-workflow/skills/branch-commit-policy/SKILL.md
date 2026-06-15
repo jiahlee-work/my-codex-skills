@@ -18,7 +18,7 @@ Use when planning or validating ticket-linked branches and commits.
 ## Outputs
 
 - Branch type and branch name
-- Scope-free commit message
+- Scope-free commit message with a lowercase type and Korean summary
 - Validation results
 - `branch-commit-plan.md`
 
@@ -26,7 +26,7 @@ Use when planning or validating ticket-linked branches and commits.
 
 1. Infer change type from content, not Jira work type.
 2. Generate `{type}/{ticketKey}-{slug}`.
-3. Generate `{type}: {summary}` with `Refs: {ticketKey}`.
+3. Generate `{type}: {Korean summary}` with `Refs: {ticketKey}`.
 4. Validate both proposals.
 
 ## Related Resources And Scripts

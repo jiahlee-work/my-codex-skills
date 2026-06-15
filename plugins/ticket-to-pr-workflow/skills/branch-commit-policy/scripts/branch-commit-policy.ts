@@ -20,6 +20,28 @@ export const allowedCommitTypes: CommitType[] = [
   "chore",
   "docs"
 ];
+const commitSummaryFallback = "티켓 요구사항 구현";
+const maxCommitSummaryLength = 64;
+const koreanTextPattern = /[\u3131-\u318e\uac00-\ud7a3]/u;
+
+export function hasKoreanText(input: string): boolean {
+  return koreanTextPattern.test(input);
+}
+
+export function normalizeCommitSummary(
+  input: string,
+  fallback = commitSummaryFallback
+): string {
+  const cleaned = input
+    .replace(/`/g, "")
+    .replace(/[.!]+$/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+  const summary = cleaned && hasKoreanText(cleaned) ? cleaned : fallback;
+  return summary.length > maxCommitSummaryLength
+    ? summary.slice(0, maxCommitSummaryLength).trimEnd()
+    : summary;
+}
 
 export function extractPlannedBranch(branchPlan: string): string {
   const headings = ["Suggested Branch", "Proposed Branch", "Branch"];
@@ -86,6 +108,29 @@ export function slugify(input: string): string {
   return slug.length > 48 ? slug.slice(0, 48).replace(/-+$/g, "") : slug;
 }
 
+function branchSlug(ticket: NormalizedTicket): string {
+  return slugify(ticket.title) || "ticket";
+}
+
+function koreanSummaryFromTicket(ticket: NormalizedTicket): string {
+  const candidates = [
+    ticket.title,
+    ticket.summary,
+    ticket.description,
+    ...(ticket.acceptanceCriteria ?? []),
+    ...(ticket.notes ?? [])
+  ];
+
+  for (const candidate of candidates) {
+    const summary = normalizeCommitSummary(candidate ?? "", "");
+    if (summary) {
+      return summary;
+    }
+  }
+
+  return commitSummaryFallback;
+}
+
 export function recommendBranchType(ticket: NormalizedTicket): BranchType {
   const text = ticketText(ticket);
 
@@ -140,10 +185,25 @@ export function validateCommitMessage(
   const normalized = message.replace(/\r\n/g, "\n").trim();
   const referencePattern = new RegExp(`(?:^|\\n|\\s)Refs:\\s*${ticketKey}(?:$|\\s)`);
   const subject = normalized.split("\n")[0]?.replace(/\s+Refs:\s+.+$/, "") ?? "";
-  const subjectMatch = /^(feat|fix|test|refactor|chore|docs):\s+(.+)$/.exec(subject);
+  const subjectMatch = /^([A-Za-z]+)(\([^)]+\))?:\s+(.+)$/.exec(subject);
 
   if (!subjectMatch) {
     errors.push("First line must match {type}: {summary} without scope.");
+  } else {
+    const [, type = "", scope, summary = ""] = subjectMatch;
+    const lowercaseType = type.toLowerCase();
+    if (type !== lowercaseType) {
+      errors.push("Commit type must be lowercase.");
+    }
+    if (!allowedCommitTypes.includes(lowercaseType as CommitType)) {
+      errors.push(`Commit type must be one of: ${allowedCommitTypes.join(", ")}.`);
+    }
+    if (scope) {
+      errors.push("Commit scope syntax is not allowed.");
+    }
+    if (!hasKoreanText(summary)) {
+      errors.push("Commit summary must be written in Korean.");
+    }
   }
 
   if (!referencePattern.test(normalized)) {
@@ -155,9 +215,9 @@ export function validateCommitMessage(
 
 export function renderBranchCommitPlan(ticket: NormalizedTicket): string {
   const branchType = recommendBranchType(ticket);
-  const branchName = `${branchType}/${ticket.key}-${slugify(ticket.title)}`;
+  const branchName = `${branchType}/${ticket.key}-${branchSlug(ticket)}`;
   const commitType = recommendCommitType(branchType);
-  const commitMessage = `${commitType}: ${slugify(ticket.title).replace(/-/g, " ")}\nRefs: ${ticket.key}`;
+  const commitMessage = `${commitType}: ${koreanSummaryFromTicket(ticket)}\nRefs: ${ticket.key}`;
   const branchValidation = validateBranchName(branchName, ticket.key);
   const commitValidation = validateCommitMessage(commitMessage, ticket.key);
 
@@ -189,6 +249,6 @@ logical
 
 - Branch type is inferred from the ticket content and expected change, not Jira work type.
 - Branch format: \`{type}/{ticketKey}-{slug}\`
-- Commit format: \`{type}: {summary}\` plus \`Refs: {ticketKey}\`
+- Commit format: lowercase \`{type}: {Korean summary}\` plus \`Refs: {ticketKey}\`
 `;
 }

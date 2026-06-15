@@ -8,7 +8,8 @@ Read the strategy from `branch-commit-plan.md`, or use `--strategy`. Default to
 - `squash`: create one commit containing every changed file.
 - `step-based`: commit tests, implementation, then supporting files.
 
-Every changed file must appear exactly once. Messages use no scope:
+Every changed file must appear exactly once. Messages use no scope, lowercase
+type, and Korean summary:
 
 ```text
 {type}: {summary}
