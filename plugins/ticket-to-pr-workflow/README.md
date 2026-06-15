@@ -3,9 +3,9 @@
 티켓의 요구사항을 정리하는 단계부터 구현, 검증, PR 준비까지 이어지는 개발
 과정을 Codex App에서 일관되게 수행하도록 설계한 workflow plugin입니다.
 
-Parent skill이 대화 맥락과 작업 상태를 읽고 9개의 child skill을 역할별로
-조율합니다. 단순히 다음 코드를 생성하는 것이 아니라 계획의 타당성, 변경
-위험, 승인 여부, 검증 결과를 확인한 뒤 다음 행동을 결정합니다.
+Parent skill이 대화 맥락과 작업 상태를 읽고 9개의 child skill과 지원 skill을
+역할별로 조율합니다. 단순히 다음 코드를 생성하는 것이 아니라 계획의 타당성,
+변경 위험, 승인 여부, 검증 결과를 확인한 뒤 다음 행동을 결정합니다.
 
 ## 해결하는 문제
 
@@ -106,6 +106,7 @@ Jira 또는 직접 전달된 작업 요청
 | Child | `branch-commit-policy` | branch·commit 전략을 제안하고 정책을 검증 |
 | Child | `ticket-code-worker` | 확인된 branch에서 티켓 범위의 코드와 테스트를 변경 |
 | Child | `verification-runner` | 로컬 검증 명령을 선택·실행하고 실패 원인을 분석 |
+| Support | `react-typescript-coding-style` | React, Next.js, TypeScript UI 코드 스타일 기준을 구현·검증 단계에 제공 |
 | Child | `storybook-verifier` | Storybook 환경, component state, story 검증을 관리 |
 | Child | `browser-scenario-verifier` | 브라우저 검증 필요성과 시나리오를 판단하고 결과를 기록 |
 | Child | `pr-reporting` | commit·PR 계획과 설명을 작성하고 최종 실행 조건을 확인 |

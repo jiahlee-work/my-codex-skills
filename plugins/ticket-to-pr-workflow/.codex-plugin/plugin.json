@@ -1,6 +1,6 @@
 {
   "name": "ticket-to-pr-workflow",
-  "version": "0.1.0+codex.20260609185633",
+  "version": "0.1.0+codex.20260615095050",
   "description": "Codex App-native ticket-to-PR workflow suite for local and private marketplaces.",
   "author": {
     "name": "my-codex-skills contributors"

@@ -1,0 +1,4 @@
+interface:
+  display_name: "React TypeScript Coding Style"
+  short_description: "Apply React, Next.js, and TypeScript style rules"
+  default_prompt: "Use $react-typescript-coding-style to implement or review React, Next.js, and TypeScript code against the coding style guide."

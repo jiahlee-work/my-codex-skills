@@ -31,10 +31,13 @@ complete.
    `--agent-run` path.
 2. Stop and list missing required inputs.
 3. Select light or full mode from implementation scope and risk.
-4. Resolve package scripts and TypeScript fallback commands.
-5. Run commands sequentially, collect logs, and stop after failure by default.
-6. Analyze failures before any allowed retry.
-7. Generate reports, update the shared agent run report, and stop before
+4. Use `react-typescript-coding-style` as a failure-analysis lens when changed
+   files include React, Next.js, TypeScript UI, TSX, JSX, hooks, or component
+   files.
+5. Resolve package scripts and TypeScript fallback commands.
+6. Run commands sequentially, collect logs, and stop after failure by default.
+7. Analyze failures before any allowed retry.
+8. Generate reports, update the shared agent run report, and stop before
    commit.
 
 Workflow:
@@ -45,6 +48,7 @@ Workflow:
 → `READ_TEST_PLAN`
 → `READ_CHANGED_FILES`
 → `DECIDE_VERIFICATION_MODE`
+→ `LOAD_REACT_TYPESCRIPT_CODING_STYLE_IF_RELEVANT`
 → `RESOLVE_AVAILABLE_COMMANDS`
 → `RUN_VERIFICATION_COMMANDS`
 → `COLLECT_LOGS`
@@ -59,6 +63,8 @@ Workflow:
 
 - Do not modify product code, tests, dependencies, package or lockfiles, or
   configuration.
+- Do not fix coding style guide violations during verification; report them as
+  actionable follow-up or failure analysis.
 - Do not install dependencies.
 - Do not commit, push, create a PR, inspect GitHub Actions, mutate Jira, or run
   Playwright MCP.
@@ -67,6 +73,7 @@ Workflow:
 ## Related Resources And Scripts
 
 - Policies and templates: `resources/*.md`
+- Supporting style skill: `react-typescript-coding-style`
 - Resolve: `scripts/resolve-verification-commands.ts`
 - Run: `scripts/run-verification.ts`
 - Analyze: `scripts/analyze-verification-failure.ts`

@@ -36,12 +36,14 @@ task planning, branch planning, test environment, and test plan artifacts.
 4. Stop for parent-managed approval when branch creation or switching is
    required, then confirm the working branch.
 5. Analyze related code, nearby tests, conventions, state, imports, and mocks.
-6. Implement only the user intent, Task Spec, and Test Plan scope.
-7. Add or update focused tests using the existing test stack.
-8. Collect the diff and changed-file metadata.
-9. Detect risky, unrelated, sensitive, large, or unapproved config changes.
-10. Generate implementation and code review reports.
-11. Stop before full local verification.
+6. Use `react-typescript-coding-style` when the implementation touches React,
+   Next.js, TypeScript UI, TSX, JSX, hooks, or component files.
+7. Implement only the user intent, Task Spec, and Test Plan scope.
+8. Add or update focused tests using the existing test stack.
+9. Collect the diff and changed-file metadata.
+10. Detect risky, unrelated, sensitive, large, or unapproved config changes.
+11. Generate implementation and code review reports.
+12. Stop before full local verification.
 
 Workflow:
 
@@ -57,6 +59,7 @@ Workflow:
 → `RESOLVE_BRANCH_PREPARATION_GATE`
 → `CONFIRM_WORKING_BRANCH`
 → `ANALYZE_CODEBASE`
+→ `APPLY_REACT_TYPESCRIPT_CODING_STYLE_IF_RELEVANT`
 → `IMPLEMENT_CODE_AND_TESTS`
 → `COLLECT_DIFF`
 → `DETECT_RISKY_CHANGES`
@@ -77,10 +80,12 @@ Workflow:
   test setup files without test-planning approval.
 - Do not run full lint, typecheck, test, build, Playwright, or retry workflows.
 - Do not commit, push, create a PR, mutate Jira, or run Playwright MCP.
+- Do not refactor unrelated files solely to apply the coding style guide.
 
 ## Related Resources And Scripts
 
 - Policies and templates: `resources/*.md`
+- Supporting style skill: `react-typescript-coding-style`
 - Git check: `scripts/check-git-status.ts`
 - Branch creation: `scripts/create-working-branch.ts`
 - Diff collection: `scripts/collect-diff.ts`

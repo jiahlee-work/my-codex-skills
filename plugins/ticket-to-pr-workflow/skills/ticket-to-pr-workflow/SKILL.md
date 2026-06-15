@@ -179,13 +179,16 @@ create `.agent-runs` or apply ticket changes inside the installed plugin.
 5. Use `branch-commit-policy` to generate and validate
    `branch-commit-plan.md`, then resolve the Branch Preparation gate.
 6. Use `ticket-code-worker` only after the working branch is confirmed.
-7. Use `verification-runner` for local verification and reports.
-8. Use `storybook-verifier` for component-state planning and verification.
-9. Use `browser-scenario-verifier` for scenario planning and Playwright MCP
+7. Let `ticket-code-worker` and `verification-runner` use
+   `react-typescript-coding-style` when changed files include React, Next.js,
+   TypeScript UI, TSX, JSX, hooks, or component files.
+8. Use `verification-runner` for local verification and reports.
+9. Use `storybook-verifier` for component-state planning and verification.
+10. Use `browser-scenario-verifier` for scenario planning and Playwright MCP
    agent-mode verification when available through Codex configuration.
-10. Use `pr-reporting` for dry-run commit and PR artifacts after Storybook and
+11. Use `pr-reporting` for dry-run commit and PR artifacts after Storybook and
     Browser gates are resolved.
-11. Return to `pr-reporting` for final approval-gated commit, push, and PR
+12. Return to `pr-reporting` for final approval-gated commit, push, and PR
     execution, then finalize the Agent Run Report.
 
 For Jira assigned-ticket selection, do not choose a space on the user's behalf.
@@ -207,3 +210,10 @@ search.
 - `browser-scenario-verifier` -> browser verification need decision, browser
   scenario planning, Playwright MCP agent-mode guidance, and Browser
   Verification Report generation.
+
+## Supporting Skill Map
+
+- `react-typescript-coding-style` -> implementation and verification guidance
+  for React, Next.js, and TypeScript UI code style. Used by
+  `ticket-code-worker` and `verification-runner`; it does not own workflow
+  phase transitions or repository mutation.

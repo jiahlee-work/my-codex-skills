@@ -73,8 +73,9 @@ message candidates.
 ## ticket-code-worker
 
 **Responsibility:** Creates ticket-scoped product and test changes on a
-confirmed working branch, then records the diff, implementation details, and
-risks.
+confirmed working branch, applies `react-typescript-coding-style` when touching
+React, Next.js, or TypeScript UI code, then records the diff, implementation
+details, and risks.
 
 **Inputs:** Planning artifacts, test plan, confirmed branch plan, user intent,
 and target repository.
@@ -88,7 +89,8 @@ commit, push, or PR creation.
 ## verification-runner
 
 **Responsibility:** Resolves and runs the repository's local verification
-commands, then analyzes failures.
+commands, then analyzes failures, including coding-style failures for changed
+React, Next.js, and TypeScript UI files.
 
 **Inputs:** Implementation artifacts, test environment report, and test plan.
 
@@ -97,6 +99,23 @@ verification logs.
 
 **Does not own:** Code modification, dependency installation, commit, push, PR
 creation, or Playwright MCP execution.
+
+## react-typescript-coding-style
+
+**Responsibility:** Provides coding-style judgment for React, Next.js, and
+TypeScript UI implementation and verification. It separates context-sensitive
+rules that Codex should apply from formatting and lint rules that Biome should
+own.
+
+**Inputs:** Changed TSX, JSX, React component, hook, event handler, derived
+state, className, and UI-related TypeScript code.
+
+**Outputs:** Applied implementation choices, review notes, or verification
+failure analysis through the worker skill currently using it.
+
+**Does not own:** Workflow phase transitions, repository mutation by itself,
+Biome configuration changes, broad style-only refactors, or verification command
+execution.
 
 ## storybook-verifier
 
