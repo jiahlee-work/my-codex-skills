@@ -1,6 +1,6 @@
 {
   "name": "repo-tooling",
-  "version": "0.1.0+codex.20260616085011",
+  "version": "0.1.0+codex.20260616132732",
   "description": "Install standard repository development tooling for React, TypeScript, and Next.js projects.",
   "author": {
     "name": "my-codex-skills contributors"
