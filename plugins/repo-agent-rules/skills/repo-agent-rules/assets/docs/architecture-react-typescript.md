@@ -36,3 +36,6 @@ src/
   or infrastructure.
 - Keep feature-specific code near the feature that owns it instead of forcing it
   into `shared`.
+- Use the configured `@/` alias for imports between files under `src/`. Do not
+  use `./` or `../` for local imports inside `src`, including imports within
+  the same feature folder.

@@ -36,12 +36,20 @@ Storybook·Playwright MCP 승인 단계, 실패 분석과 제한적 재시도를
 ### repo-agent-rules
 
 여러 레포에 반복 적용할 고정 agent rules를 설치하는 plugin입니다.
-사용자에게 프로젝트 타입과 main push 정책만 확인한 뒤, 정해진 `AGENTS.md`,
-`docs/engineering/*`, Husky, commitlint guardrail 파일을 생성합니다. 레포의
-현재 구조, API, 환경 변수, README, 기존 문서를 분석해 맞춤 문서를 만들지
-않습니다.
+사용자에게 프로젝트 타입과 main push 정책만 확인한 뒤, 정해진 `AGENTS.md`와
+`docs/engineering/*` 문서를 생성합니다. 레포의 현재 구조, API, 환경 변수,
+README, 기존 문서를 분석해 맞춤 문서를 만들지 않습니다.
 
 - [상세 설명](plugins/repo-agent-rules/README.md)
+
+### repo-tooling
+
+여러 레포에 반복 적용할 개발 도구를 설치하는 plugin입니다. Biome,
+Vitest + React Testing Library, Storybook, Husky + commitlint, lint-staged를
+각각 좁은 skill로 설치하고, `repo-agent-rules`의 문서 규칙과 충돌하지 않게
+package, config, hook 파일을 관리합니다.
+
+- [상세 설명](plugins/repo-tooling/README.md)
 
 ## 설치
 

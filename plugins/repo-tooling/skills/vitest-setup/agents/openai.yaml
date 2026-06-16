@@ -1,0 +1,4 @@
+interface:
+  display_name: "Vitest Setup"
+  short_description: "Install Vitest with React Testing Library"
+  default_prompt: "Use $repo-tooling:vitest-setup to install Vitest and React Testing Library."

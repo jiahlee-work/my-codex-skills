@@ -38,6 +38,8 @@ src/
   presentation -> application -> infrastructure -> external systems.
 - `shared` must stay neutral. It must not depend on presentation, application,
   or infrastructure.
-- Follow the repository's configured import alias. If `@/*` maps to `./src/*`,
-  use imports like `@/presentation/...`. If `@/*` maps to `./*`, use imports
-  like `@/src/presentation/...`.
+- Use the configured `@/` alias for imports between files under `src/`. Do not
+  use `./` or `../` for local imports inside `src`, including imports within
+  the same feature folder.
+- If `@/*` maps to `./src/*`, use imports like `@/presentation/...`. If `@/*`
+  maps to `./*`, use imports like `@/src/presentation/...`.

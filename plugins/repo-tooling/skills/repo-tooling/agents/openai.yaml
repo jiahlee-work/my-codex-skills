@@ -1,0 +1,4 @@
+interface:
+  display_name: "Repo Tooling"
+  short_description: "Coordinate standard tooling setup"
+  default_prompt: "Use $repo-tooling to install standard repository tooling."

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Storybook Setup"
+  short_description: "Install standard Storybook config"
+  default_prompt: "Use $repo-tooling:storybook-setup to install standard Storybook setup."

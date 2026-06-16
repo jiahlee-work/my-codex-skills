@@ -1,7 +1,6 @@
 # Git Workflow
 
-This document defines common Git rules for agents and the minimal hook policy
-that enforces them.
+This document defines common Git rules for agents.
 
 ## Working Tree
 
@@ -32,13 +31,13 @@ Allowed:
 feat: add login form
 feat(auth): add login form
 fix: 로그인 오류 수정
-chore(deps): update husky
+chore(deps): update tooling
 ```
 
 English and Korean descriptions are both allowed.
 
-## Hook Policy
+## Tooling
 
-- `commit-msg` runs commitlint.
-- `pre-commit` blocks obvious secret files from being committed.
-- No branch-blocking pre-push hook is installed by this ruleset.
+- Tooling may enforce part of this policy when the repository installs
+  commitlint, Husky, or lint-staged.
+- This rules document does not install hooks or package dependencies.

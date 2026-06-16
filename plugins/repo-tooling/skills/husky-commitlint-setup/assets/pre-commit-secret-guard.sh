@@ -1,6 +1,4 @@
-#!/usr/bin/env sh
-set -eu
-
+# repo-tooling secret guard start
 blocked_files="$(git diff --cached --name-only | grep -E '(^|/)(\.env($|\.)|id_rsa$|id_ed25519$|.*\.(pem|key|p12|pfx)$)' || true)"
 
 if [ -n "$blocked_files" ]; then
@@ -8,3 +6,4 @@ if [ -n "$blocked_files" ]; then
   echo "$blocked_files"
   exit 1
 fi
+# repo-tooling secret guard end

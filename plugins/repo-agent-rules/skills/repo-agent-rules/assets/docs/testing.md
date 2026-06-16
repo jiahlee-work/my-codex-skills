@@ -1,8 +1,7 @@
 # Testing
 
 Testing rules define when and how agents should protect behavior. They do not
-choose a test runner, test framework, file naming convention, setup file, or
-package script.
+choose a test runner, test framework, setup file, or package script.
 
 ## Principles
 
@@ -14,6 +13,21 @@ package script.
 - Prefer focused tests near the changed behavior.
 - Avoid broad snapshots unless the snapshot is intentionally reviewed and
   stable.
+- Place tests near the code they cover in a `__tests__` folder.
+- Name tests `*.test.ts` for non-React TypeScript and `*.test.tsx` for React
+  component tests.
+
+## File Placement
+
+Use colocated `__tests__` folders:
+
+```text
+src/application/services/payment.ts
+src/application/services/__tests__/payment.test.ts
+
+src/presentation/components/button.tsx
+src/presentation/components/__tests__/button.test.tsx
+```
 
 ## When To Add Or Update Tests
 

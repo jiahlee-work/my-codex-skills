@@ -28,6 +28,13 @@
 - Add or update tests when behavior changes or a bug is fixed.
 - Do not introduce a new test tool unless the user explicitly asks.
 
+## Storybook
+
+- Follow `docs/engineering/storybook.md`.
+- Add or update stories for reusable UI components and important changed states
+  when Storybook tooling exists.
+- Do not introduce Storybook tooling unless the user explicitly asks.
+
 ## Verification
 
 - Follow `docs/engineering/verification.md`.

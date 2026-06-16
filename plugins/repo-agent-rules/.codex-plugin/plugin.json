@@ -1,6 +1,6 @@
 {
   "name": "repo-agent-rules",
-  "version": "0.1.0+codex.20260615170600",
+  "version": "0.1.0+codex.20260616085011",
   "description": "Install fixed repo-local AGENTS.md and engineering rule docs for coding agents.",
   "author": {
     "name": "my-codex-skills contributors"
@@ -19,7 +19,7 @@
   "interface": {
     "displayName": "Repo Agent Rules",
     "shortDescription": "Install fixed agent rules.",
-    "longDescription": "Installs a fixed AGENTS.md, fixed engineering rule docs, and minimal Husky/commitlint guardrails. It asks only for project type and main push policy, and does not inspect repository source to generate custom documentation.",
+    "longDescription": "Installs a fixed AGENTS.md and fixed engineering rule docs. It asks only for project type and main push policy, and does not inspect repository source to generate custom documentation or install tooling.",
     "developerName": "my-codex-skills contributors",
     "category": "Productivity",
     "capabilities": [

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Lint-Staged Setup"
+  short_description: "Install lint-staged with Biome"
+  default_prompt: "Use $repo-tooling:lint-staged-setup to install lint-staged with Biome."

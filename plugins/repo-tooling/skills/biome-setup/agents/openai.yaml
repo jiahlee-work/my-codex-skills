@@ -1,0 +1,4 @@
+interface:
+  display_name: "Biome Setup"
+  short_description: "Install Biome and standard config"
+  default_prompt: "Use $repo-tooling:biome-setup to install Biome and standard lint/format scripts."

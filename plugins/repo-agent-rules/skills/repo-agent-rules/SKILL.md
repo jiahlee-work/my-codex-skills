@@ -1,6 +1,6 @@
 ---
 name: repo-agent-rules
-description: Install fixed repo-local AGENTS.md, fixed engineering rule docs, and minimal Husky/commitlint guardrails. Use when Codex needs to create or refresh common agent rules across repositories without repository-specific documentation.
+description: Install fixed repo-local AGENTS.md and fixed engineering rule docs. Use when Codex needs to create or refresh common agent rules across repositories without repository-specific documentation or tooling setup.
 ---
 
 # Repo Agent Rules
@@ -32,19 +32,8 @@ Do not inspect source files, route files, API files, README, existing docs,
 environment files, UI implementation, package scripts, or current feature
 behavior to generate documentation.
 
-The only allowed repository state checks are the minimum checks needed to make
-Husky and commitlint work:
-
-- `package.json`
-- package manager from `packageManager` or lockfile
-- existing `devDependencies.husky`
-- existing `devDependencies.@commitlint/cli`
-- existing `devDependencies.@commitlint/config-conventional`
-- existing `scripts.prepare`
-- `.husky/`
-
-Use these checks only for hook setup. Do not include their results in generated
-docs.
+Do not inspect package manager, package dependencies, lockfiles, tool configs, or
+hooks. This skill installs fixed rule documents only.
 
 ## Fixed Output Contract
 
@@ -54,24 +43,14 @@ Always write these files from assets:
 - `docs/engineering/coding-style.md`
 - `docs/engineering/architecture.md`
 - `docs/engineering/testing.md`
+- `docs/engineering/storybook.md`
 - `docs/engineering/verification.md`
 - `docs/engineering/git-workflow.md`
-- `commitlint.config.cjs`
-- `.husky/commit-msg`
-- `.husky/pre-commit`
-
-When main push is forbidden, also write:
-
-- `.husky/pre-push`
-- `scripts/guard-branch.mjs`
-
-When main push is allowed, do not write `.husky/pre-push` or
-`scripts/guard-branch.mjs` unless the user explicitly asks for those paths.
 
 Do not create or update any other file, including `README.md`, `docs/*.md`
 outside `docs/engineering`, API docs, prompt docs, development docs, package
-scripts beyond `prepare`, CI files, test config, Storybook config, formatter
-config, or editor config.
+scripts, CI files, test config, Storybook config, formatter config, hooks,
+commitlint config, or editor config.
 
 ## Asset Selection
 
@@ -87,45 +66,10 @@ Use these fixed assets:
 - `assets/docs/architecture-nextjs.md` or
   `assets/docs/architecture-react-typescript.md`
 - `assets/docs/testing.md`
+- `assets/docs/storybook.md`
 - `assets/docs/verification.md`
 - `assets/docs/git-workflow-main-forbidden.md` or
   `assets/docs/git-workflow-main-allowed.md`
-- `assets/hooks/commitlint.config.cjs`
-- `assets/hooks/commit-msg`
-- `assets/hooks/pre-commit`
-- `assets/hooks/pre-push-main-forbidden` when main push is forbidden
-- `assets/hooks/guard-branch.mjs` when main push is forbidden
-
-## Hook Setup
-
-If `package.json` exists, install missing hook dependencies without asking:
-
-- `husky`
-- `@commitlint/cli`
-- `@commitlint/config-conventional`
-
-Infer the package manager in this order:
-
-1. `packageManager` field in `package.json`
-2. lockfile: `pnpm-lock.yaml`, `bun.lockb`, `bun.lock`, `yarn.lock`,
-   `package-lock.json`
-3. fallback to `npm`
-
-Use the matching install command:
-
-- pnpm: `pnpm add -D husky @commitlint/cli @commitlint/config-conventional`
-- npm: `npm install --save-dev husky @commitlint/cli @commitlint/config-conventional`
-- yarn: `yarn add -D husky @commitlint/cli @commitlint/config-conventional`
-- bun: `bun add -d husky @commitlint/cli @commitlint/config-conventional`
-
-Ensure `package.json` has `"prepare": "husky"` while preserving existing
-scripts. If `prepare` already exists and is not `husky`, do not overwrite it;
-report that hook installation may need manual integration.
-
-Make generated Husky files executable.
-
-If `package.json` does not exist, still write the fixed docs and report that
-Husky/commitlint setup was skipped because there is no Node package manifest.
 
 ## Commit Message Policy
 
@@ -143,8 +87,7 @@ After installing rules, report:
 
 - the two selected choices
 - files written
-- hook dependencies installed or already present
-- any hook setup skipped because `package.json` was missing
+- that no package, hook, or tooling setup was performed
 
 Do not run application lint, test, typecheck, build, Storybook, browser, or API
 verification unless the user explicitly asks.

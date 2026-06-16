@@ -1,0 +1,4 @@
+interface:
+  display_name: "Husky Commitlint Setup"
+  short_description: "Install Husky and commitlint guardrails"
+  default_prompt: "Use $repo-tooling:husky-commitlint-setup to install Husky and commitlint."
