@@ -1,0 +1,4 @@
+interface:
+  display_name: "Env Setup"
+  short_description: "Create fixed env templates"
+  default_prompt: "Use $repo-tooling:env-setup to create fixed .env.example and .env.local templates."

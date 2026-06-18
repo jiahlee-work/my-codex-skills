@@ -1,6 +1,6 @@
 {
   "name": "repo-tooling",
-  "version": "0.1.0+codex.20260616132732",
+  "version": "0.1.0+codex.20260618070138",
   "description": "Install standard repository development tooling for React, TypeScript, and Next.js projects.",
   "author": {
     "name": "my-codex-skills contributors"
@@ -14,13 +14,14 @@
     "storybook",
     "husky",
     "commitlint",
-    "lint-staged"
+    "lint-staged",
+    "env"
   ],
   "skills": "./skills/",
   "interface": {
     "displayName": "Repo Tooling",
     "shortDescription": "Install standard repo tooling.",
-    "longDescription": "Installs standard Biome, Vitest with React Testing Library, Storybook, Husky with commitlint, and lint-staged setup using narrow, repeatable skills.",
+    "longDescription": "Installs standard Biome, Vitest with React Testing Library, Storybook, Husky with commitlint, lint-staged, and env file setup using narrow, repeatable skills.",
     "developerName": "my-codex-skills contributors",
     "category": "Productivity",
     "capabilities": [
@@ -28,7 +29,7 @@
       "Write"
     ],
     "defaultPrompt": [
-      "Use repo-tooling to install Biome, Vitest, Storybook, Husky, commitlint, or lint-staged.",
+      "Use repo-tooling to install Biome, Vitest, Storybook, Husky, commitlint, lint-staged, or env files.",
       "Set up standard frontend tooling in this repository."
     ]
   }
