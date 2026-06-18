@@ -1,6 +1,6 @@
 {
   "name": "repo-agent-rules",
-  "version": "0.1.0+codex.20260616085011",
+  "version": "0.1.0+codex.20260618080906",
   "description": "Install fixed repo-local AGENTS.md and engineering rule docs for coding agents.",
   "author": {
     "name": "my-codex-skills contributors"

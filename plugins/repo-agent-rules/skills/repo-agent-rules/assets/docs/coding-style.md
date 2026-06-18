@@ -30,6 +30,12 @@ repository's formatter, linter, or type checker.
   derivation.
 - Name event handlers by user intent, such as `handleSubmit` or
   `handleDialogClose`.
+- Inline event handlers are acceptable for a single direct action, such as
+  `onClick={() => selectThread(id)}`.
+- Extract an event handler when the interaction includes branching, multiple
+  actions, state updates, side effects, or meaningful product intent.
+- Use functional state updates when the next state depends on the previous
+  state, such as `setIsOpen((current) => !current)`.
 - Keep loading, empty, error, disabled, and success states explicit when they
   are user-visible.
 
