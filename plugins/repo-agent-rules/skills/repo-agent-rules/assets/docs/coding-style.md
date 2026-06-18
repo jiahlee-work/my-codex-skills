@@ -27,6 +27,14 @@ repository's formatter, linter, or type checker.
 
 - Keep render logic readable and extract components when one component has
   multiple distinct responsibilities.
+- Destructure component props inside the component body unless the component is
+  intentionally trivial.
+- Keep component body declarations in this order:
+  props destructuring, external hooks, local constants or derived IDs, state
+  hooks, derived values, event handlers or local functions, effects, early
+  returns, then render.
+- Treat router, params, search params, pathname, context, store selectors, and
+  `useId` as hooks for declaration-order purposes.
 - Prefer derived values over duplicated state.
 - Use effects for synchronization with external systems, not for ordinary data
   derivation.
