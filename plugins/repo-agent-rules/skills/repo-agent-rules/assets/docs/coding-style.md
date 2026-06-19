@@ -29,12 +29,18 @@ repository's formatter, linter, or type checker.
   multiple distinct responsibilities.
 - Destructure component props inside the component body unless the component is
   intentionally trivial.
-- Keep component body declarations in this order:
-  props destructuring, external hooks, local constants or derived IDs, state
-  hooks, derived values, event handlers or local functions, effects, early
-  returns, then render.
+- Keep component body declarations in this default order: props destructuring,
+  local constants or derived IDs needed by hooks, external hooks, refs and IDs,
+  state or reducer hooks, memo hooks, non-hook derived values, callback hooks,
+  effect hooks, non-hook event handlers or local functions, early returns, then
+  render.
+- Use the declaration order as a default reading structure. If dependencies
+  between hooks, derived values, or handlers make the default order harder to
+  read, prefer the order that keeps data flow simplest and avoids unnecessary
+  indirection.
 - Treat router, params, search params, pathname, context, store selectors, and
-  `useId` as hooks for declaration-order purposes.
+  `useId`, `useRef`, `useMemo`, `useCallback`, `useEffect`, and
+  `useLayoutEffect` as hooks for declaration-order purposes.
 - Prefer derived values over duplicated state.
 - Use effects for synchronization with external systems, not for ordinary data
   derivation.

@@ -41,21 +41,28 @@
 
 ## 1. 컴포넌트 내부 선언 순서
 
-컴포넌트 내부 선언은 아래 순서를 따른다.
+컴포넌트 내부 선언은 아래 순서를 기본 권장 구조로 따른다.
 
 ```tsx
 function Component(props) {
   // 1. props destructuring
-  // 2. external hooks: router, params, searchParams, context, store
-  // 3. local constants / derived ids
-  // 4. state hooks
-  // 5. derived values: useMemo
-  // 6. event handlers: useCallback or normal functions
-  // 7. effects
-  // 8. early returns
-  // 9. render
+  // 2. local constants / derived ids needed by hooks
+  // 3. external hooks: router, params, searchParams, context, store
+  // 4. refs / ids
+  // 5. state / reducer hooks
+  // 6. memo hooks: useMemo
+  // 7. non-hook derived values
+  // 8. callback hooks: useCallback
+  // 9. effect hooks: useEffect, useLayoutEffect
+  // 10. non-hook event handlers / local functions
+  // 11. early returns
+  // 12. render
 }
 ```
+
+이 순서는 기본 읽기 구조다. hooks, derived values, handlers 사이의 의존성
+때문에 이 순서가 오히려 읽기 어렵거나 로직을 복잡하게 만든다면, 데이터 흐름이
+가장 단순하고 불필요한 우회를 만들지 않는 순서를 우선한다.
 
 예시:
 
@@ -65,35 +72,53 @@ function ChatPanel(props: ChatPanelProps) {
 
   const router = useRouter()
   const searchParams = useSearchParams()
-
-  const mode = searchParams.get("mode") ?? "default"
-  const isReadonly = mode === "readonly"
+  const inputRef = useRef<HTMLInputElement>(null)
+  const generatedId = useId()
 
   const [messages, setMessages] = useState(initialMessages)
   const [input, setInput] = useState("")
 
-  const canSubmit = useMemo(() => {
-    return input.trim().length > 0 && !isReadonly
-  }, [input, isReadonly])
+  const visibleMessages = useMemo(() => {
+    return messages.filter((message) => !message.deletedAt)
+  }, [messages])
 
-  const handleSubmit = () => {
+  const mode = searchParams.get("mode") ?? "default"
+  const hasMessages = visibleMessages.length > 0
+  const canSubmit = input.trim().length > 0 && mode !== "readonly"
+
+  const handleSubmit = useCallback(() => {
     // ...
-  }
+    router.refresh()
+  }, [router])
 
   useEffect(() => {
-    // ...
-  }, [])
+    if (!hasMessages) {
+      inputRef.current?.focus()
+    }
+  }, [hasMessages])
 
-  if (messages.length === 0) {
+  function formatMessageCount() {
+    return `${visibleMessages.length} messages`
+  }
+
+  if (!hasMessages) {
     return <EmptyMessageState />
   }
 
-  return <MessageList messages={messages} />
+  return (
+    <MessageList
+      canSubmit={canSubmit}
+      id={`${generatedId}-${chatId}`}
+      label={formatMessageCount()}
+      messages={visibleMessages}
+    />
+  )
 }
 ```
 
 `useId`, `useRouter`, `useParams`, `useSearchParams`, `usePathname`,
-`useContext`, store selector는 모두 hook 그룹에 둔다.
+`useContext`, `useRef`, `useMemo`, `useCallback`, `useEffect`,
+`useLayoutEffect`, store selector는 모두 hook 그룹에 둔다.
 
 ```tsx
 const generatedId = useId()

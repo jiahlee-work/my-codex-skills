@@ -34,9 +34,13 @@ description: Apply React, Next.js, and TypeScript coding style rules during impl
 
 - Destructure component props inside the function unless the component is
   intentionally trivial.
-- Keep component declarations in the documented order: props, external hooks,
-  local constants, state, derived values, handlers, effects, early returns,
-  render.
+- Keep component declarations in the documented default order: props, hook input
+  constants, external hooks, refs and IDs, state or reducer hooks, memo hooks,
+  non-hook derived values, callback hooks, effect hooks, non-hook handlers or
+  local functions, early returns, render.
+- Prefer simpler data flow over mechanically following the default order when
+  hook, derived value, or handler dependencies would otherwise become harder to
+  read.
 - Name booleans with `is`, `has`, `can`, or `should`.
 - Use `on*` for injected callbacks and `handle*` for internal event handlers.
 - Do not store values in state when they can be derived from props or state.
